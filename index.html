@@ -2,89 +2,124 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stream Básico</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Movies+</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0f0f0f;
-  color:#fff;
-}
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
+:root{--p:#f5c518;--bg:#0a0a0a;--s:#161616;--c:#1a1a1a;--b:#2a2a2a;--t:#e0e0e0;--t2:#888}
+html,body{background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;height:100%;overflow:hidden}
+#app{height:100%;display:flex;flex-direction:column}
+.hdr{display:flex;align-items:center;gap:10px;padding:12px;background:var(--s);border-bottom:1px solid var(--b)}
+.logo{color:var(--p);font-weight:700;font-size:18px}
+.srch{flex:1;background:var(--bg);border:2px solid var(--b);color:var(--t);padding:10px;border-radius:8px;font-size:16px;outline:none}
+.btn{background:var(--c);border:2px solid var(--b);color:var(--t);padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer}
+.stats{color:var(--t2);font-size:12px;margin-left:auto}
+.main{flex:1;overflow-y:auto;padding:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.card{aspect-ratio:2/3;background:var(--c);border-radius:6px;overflow:hidden;cursor:pointer}
+.card img{width:100%;height:100%;object-fit:cover}
+.card-t{padding:5px;font-size:11px;text-align:center}
 
-header{
-  padding:15px;
-  text-align:center;
-  background:#000;
-  font-size:20px;
-  font-weight:bold;
-}
-
-.search{
-  padding:10px;
-  text-align:center;
-}
-
-.search input{
-  width:90%;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-  gap:10px;
-  padding:10px;
-}
-
-.card{
-  background:#1c1c1c;
-  padding:10px;
-  border-radius:10px;
-  cursor:pointer;
-  text-align:center;
-  transition:0.2s;
-}
-
-.card:hover{
-  background:#333;
-}
-
-.player{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#000;
-  padding:10px;
-  display:none;
-}
-
-video{
-  width:100%;
-  border-radius:10px;
-}
+.player{position:fixed;inset:0;background:#000;display:none;flex-direction:column}
+.player.open{display:flex}
+video{flex:1;width:100%}
+.p-top{padding:10px;background:#111}
 </style>
-
 </head>
+
 <body>
+<div id="app">
 
-<header>📺 Stream Básico</header>
-
-<div class="search">
-  <input type="text" id="search" placeholder="Buscar película...">
+<div class="hdr">
+  <div class="logo">MOVIES+</div>
+  <input id="search" class="srch" placeholder="Buscar...">
+  <button id="random" class="btn">🎲</button>
+  <span id="stats" class="stats"></span>
 </div>
 
-<div class="grid" id="grid"></div>
-
-<div class="player" id="player">
-  <video id="video" controls></video>
+<div class="main">
+  <div id="grid" class="grid"></div>
 </div>
 
-<script src="app.js"></script>
+</div>
+
+<!-- PLAYER -->
+<div id="player" class="player">
+  <div class="p-top">
+    <button onclick="closePlayer()" class="btn">⬅ Volver</button>
+    <span id="title"></span>
+  </div>
+  <video id="video" controls playsinline></video>
+</div>
+
+<script>
+let MOVIES = [];
+
+async function loadData() {
+  const res = await fetch('data.json');
+  const data = await res.json();
+
+  MOVIES = data.map((m, i) => ({
+    id: i,
+    title: m.title || 'Sin título',
+    poster: m.logo || '',
+    url: m.url || ''
+  }));
+
+  document.getElementById('stats').textContent = MOVIES.length + ' películas';
+  render(MOVIES);
+}
+
+function render(list) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  list.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'card';
+
+    div.innerHTML = `
+      <img src="${m.poster}">
+      <div class="card-t">${m.title}</div>
+    `;
+
+    div.onclick = () => play(m);
+    grid.appendChild(div);
+  });
+}
+
+function play(m) {
+  document.getElementById('player').classList.add('open');
+  document.getElementById('title').textContent = m.title;
+
+  const video = document.getElementById('video');
+
+  // ⚠️ Sin proxy (solo funciona si el video permite CORS)
+  video.src = m.url;
+  video.play();
+}
+
+function closePlayer() {
+  const video = document.getElementById('video');
+  video.pause();
+  video.src = '';
+  document.getElementById('player').classList.remove('open');
+}
+
+// búsqueda
+document.getElementById('search').oninput = (e) => {
+  const q = e.target.value.toLowerCase();
+  render(MOVIES.filter(m => m.title.toLowerCase().includes(q)));
+};
+
+// random
+document.getElementById('random').onclick = () => {
+  render([...MOVIES].sort(() => Math.random() - 0.5));
+};
+
+loadData();
+</script>
 
 </body>
 </html>
