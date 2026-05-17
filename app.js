@@ -1,47 +1,65 @@
-const movies = [
-  {
-    name: "Película 1",
-    url: "https://test-streams.mux.dev/bigbuckbunny/mp4/master.m3u8"
-  },
-  {
-    name: "Película 2",
-    url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-  },
-  {
-    name: "Película 3",
-    url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
-  }
-];
+let MOVIES = [];
 
-const grid = document.getElementById("grid");
-const player = document.getElementById("player");
-const video = document.getElementById("video");
-const search = document.getElementById("search");
+async function loadData() {
+  const res = await fetch('data.json');
+  const data = await res.json();
 
-function render(list){
-  grid.innerHTML = "";
+  MOVIES = data.map((m, i) => ({
+    id: i,
+    title: m.title,
+    poster: m.logo,
+    url: m.url
+  }));
+
+  document.getElementById('stats').textContent = MOVIES.length + ' películas';
+  render(MOVIES);
+}
+
+function render(list) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
   list.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = m.name;
+    const div = document.createElement('div');
+    div.className = 'card';
 
-    div.onclick = () => {
-      player.style.display = "block";
-      video.src = m.url;
-      video.play();
-    };
+    div.innerHTML = `
+      <img src="${m.poster}">
+      <div class="card-t">${m.title}</div>
+    `;
 
+    div.onclick = () => play(m);
     grid.appendChild(div);
   });
 }
 
-render(movies);
+function play(m) {
+  const player = document.getElementById('player');
+  const video = document.getElementById('video');
 
-// buscador
-search.addEventListener("input", e => {
-  const value = e.target.value.toLowerCase();
-  const filtered = movies.filter(m =>
-    m.name.toLowerCase().includes(value)
-  );
-  render(filtered);
-});
+  player.classList.add('open');
+  document.getElementById('title').textContent = m.title;
+
+  video.src = m.url;
+  video.play();
+}
+
+function closePlayer() {
+  const video = document.getElementById('video');
+  video.pause();
+  video.src = '';
+  document.getElementById('player').classList.remove('open');
+}
+
+// search
+document.getElementById('search').oninput = (e) => {
+  const q = e.target.value.toLowerCase();
+  render(MOVIES.filter(m => m.title.toLowerCase().includes(q)));
+};
+
+// random
+document.getElementById('random').onclick = () => {
+  render([...MOVIES].sort(() => Math.random() - 0.5));
+};
+
+loadData();
