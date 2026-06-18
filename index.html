@@ -1,379 +1,1333 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <script>(function(s){s.dataset.zone='9900658',s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-   
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Juegosrd.Store</title>
- 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TV+ · Canales en vivo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
+:root{--p:#f5c518;--bg:#0a0a0a;--s:#161616;--c:#1a1a1a;--b:#2a2a2a;--t:#e0e0e0;--t2:#888}
+html,body{background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;height:100%;overflow:hidden}
+#app{height:100%;display:flex;flex-direction:column}
+.hdr{display:flex;align-items:center;gap:10px;padding:12px;background:var(--s);border-bottom:1px solid var(--b);justify-content:space-between}
+.logo{color:var(--p);font-weight:700;font-size:18px;cursor:pointer;padding:4px 8px;border-radius:4px;transition:background 0.2s}
+.logo:hover,.logo.f{background:rgba(245,197,24,0.1)}
+.stats{color:var(--t2);font-size:10px}
+.main{flex:1;overflow-y:auto;padding:10px;-webkit-overflow-scrolling:touch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
 
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background-color: #121212; /* Fondo más oscuro para evitar fatiga visual en TVs */
-      color: #fff;
-      padding: 3% 5%; /* "Safe zone" para evitar que los bordes se corten en algunas TVs (Overscan) */
-    }
+.card{
+position:relative;
+aspect-ratio:3000/1500;
+background:var(--c);
+border-radius:6px;
+overflow:hidden;
+border:0.05px solid transparent;
+cursor:pointer;
+transition:all 0.2s;
+will-change:border-color;
+}
 
-    header {
-      background-color: #1e1e1e;
-      color: #00ffff;
-      padding: 15px;
-      text-align: center;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 32px;
-    }
-
-    .grid-container {
-      display: grid;
-      gap: 20px;
-      padding: 10px 0;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-
-    /* Tarjetas adaptadas para enfoque de Smart TV */
-    .game-card {
-      background-color: #1e1e1e;
-      border: 3px solid transparent; /* Espacio reservado para el borde de enfoque */
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      cursor: pointer;
-      outline: none; /* Elimina el borde azul por defecto del navegador */
-    }
-
-    /* Efecto visual al navegar con las flechas del control remoto o mouse */
-    .game-card:focus, .game-card:hover {
-      transform: scale(1.08);
-      border-color: #00ffff;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
-      background-color: #252525;
-    }
-
-    .game-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .game-card .title {
-      padding: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Modal adaptado a TV */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.95);
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-    }
-
-    .modal-content {
-      position: relative;
-      background: #000;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .modal iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* Botón cerrar más grande y visible en TV */
-    .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 25px;
-      color: #fff;
-      font-size: 35px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 10000;
-      background-color: rgba(0, 0, 0, 0.7);
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid transparent;
-      transition: border-color 0.2s;
-    }
-
-    .close-btn:hover, .close-btn:focus {
-      color: #ff4444;
-      border-color: #ff4444;
-      outline: none;
-    }
-
-    /* RESPONSIVE: Adaptaciones para móviles y pantallas pequeñas */
-    @media (max-width: 600px) {
-      .grid-container {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-      }
-
-      .game-card img {
-        height: 100px;
-      }
-
-      .game-card .title {
-        font-size: 11px;
-        padding: 6px;
-      }
-
-      .game-card {
-        border-radius: 12px;
-      }
-    }
-  </style>
-  
-  <meta name="monetag" content="7812f82436d0282fbdec6764e2867d02">
+.card:hover{transform:scale(1.02)}
+.card.f{border-color:var(--p);transform:scale(1.05);box-shadow:0 0 15px rgba(245,197,24,.3);z-index:10}
+.card img{width:100%;height:100%;object-fit:cover;background:linear-gradient(45deg,#1a1a1a 25%,#222 25%,#222 50%,#1a1a1a 50%,#1a1a1a 75%,#222 75%,#222);background-size:20px 20px;opacity:0;transition:opacity 0.3s ease-in-out}
+.card img.loaded{opacity:1}
+.card-t{position:absolute;bottom:0;left:0;right:0;padding:20px 6px 6px;background:linear-gradient(transparent,#000);font-size:11px;font-weight:600;opacity:0;transform:translateY(5px);transition:opacity 0.2s, transform 0.2s}
+.card.f .card-t{opacity:1;transform:translateY(0)}
+.player{position:fixed;inset:0;background:#000;z-index:200;display:none;overflow:hidden}
+.player.open{display:flex;flex-direction:column}
+.player-content{flex:1;width:100%;position:relative;background:#000}
+video, .yt-player{width:100%;height:100%}
+.yt-player{display:flex;align-items:center;justify-content:center}
+.yt-player iframe{width:100%;height:100%;border:none}
+.p-ui{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;opacity:1;transition:.2s;background:linear-gradient(#000a,transparent 15%,transparent 85%,#000a);pointer-events:none;z-index:100}
+.p-ui>*{pointer-events:auto}
+.p-ui.hide{opacity:0}
+.p-ui.hide>*{pointer-events:none}
+.p-top{padding:12px;padding-top:max(12px,env(safe-area-inset-top))}
+.p-title{font-size:14px;font-weight:600}
+.p-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:40px;font-weight:700;opacity:0;transition:.15s;pointer-events:none}
+.p-center.show{opacity:1}
+.p-bottom{padding:12px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.p-prog{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.p-time{font-size:12px;min-width:45px}
+.p-bar{flex:1;height:5px;background:#444;border-radius:3px;position:relative;cursor:pointer}
+.p-bar-fill{position:absolute;left:0;top:0;height:100%;background:var(--p);border-radius:3px}
+.p-bar-buf{position:absolute;left:0;top:0;height:100%;background:#666;border-radius:3px;z-index:-1}
+.p-ctrl{display:flex;justify-content:center;gap:10px}
+.p-btn{width:44px;height:44px;background:rgba(255,255,255,.1);border:none;border-radius:50%;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.2s}
+.p-btn:hover,.p-btn:active,.p-btn.f{background:var(--p);color:#000}
+.p-btn.main{width:52px;height:52px;font-size:18px}
+.p-load,.p-err{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;display:none;z-index:150}
+.p-load.show,.p-err.show{display:block}
+.p-spin{width:36px;height:36px;border:3px solid #333;border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+.msg{text-align:center;padding:40px;color:var(--t2)}
+.msg.load::after{content:'';display:block;width:20px;height:20px;margin:12px auto 0;border:2px solid #333;border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
+<div id="app">
+<div class="hdr">
+    <div class="logo f" id="logo"> 📺 STREAMING EN VIVO</div>
+    <span class="stats" id="stats"></span>
+</div>
+<div class="main" id="main">
+    <div class="grid" id="grid"><div class="msg load">Cargando contenido...</div></div>
+</div>
+</div>
 
-  <header>
-    <h1>Juegosrd.Store</h1>
-  </header>
-   
-  <main>
-    <div class="grid-container" id="games">
-      <!-- Tarjetas de juegos dinámicas -->
-    </div>
-  </main>
+<div class="player" id="player">
+<div class="player-content" id="playerContent">
+    <video id="vid" playsinline webkit-playsinline style="display:none"></video>
+    <div class="yt-player" id="ytPlayer" style="display:none"></div>
+</div>
+<div class="p-load" id="pLoad"><div class="p-spin"></div><div id="pLoadTxt">Cargando...</div></div>
+<div class="p-err" id="pErr"><div>❌ Error</div><div style="font-size:11px;color:#888;margin:8px 0" id="pErrTxt"></div><button class="p-btn" id="pRetry">Reintentar</button> <button class="p-btn" id="pBack">Volver</button></div>
+<div class="p-center" id="pInd"></div>
+<div class="p-ui" id="pUi">
+<div class="p-top"><div class="p-title" id="pTitle"></div></div>
+<div class="p-bottom">
+<div class="p-prog" id="pProgContainer" style="display:none"><span class="p-time" id="pCur">0:00</span><div class="p-bar" id="pBar"><div class="p-bar-buf" id="pBuf"></div><div class="p-bar-fill" id="pFill"></div></div><span class="p-time" id="pDur">0:00</span></div>
+<div class="p-ctrl"><button class="p-btn" id="pRw" style="display:none">-10</button><button class="p-btn main" id="pPp" style="display:none">▶</button><button class="p-btn" id="pFw" style="display:none">+10</button></div>
+</div></div></div>
 
-  <!-- Modal -->
-  <div class="modal" id="gameModal">
-    <div class="modal-content">
-      <!-- Agregamos tabindex para que el botón de cerrar también sea accesible en TV -->
-      <span class="close-btn" id="closeModal" tabindex="0">×</span>
-      <iframe id="gameFrame" src=""></iframe>
-    </div>
-  </div>
-
-  <script>
-    const games = 
-      [
-  {
-    "id": "75032",
-    "title": "Pin Out Rescue Game",
-    "description": "Welcome to Pin Out Rescue Game, a fun and addictive puzzle rescue game where your brainpower is the key to success. Solve challenging levels by pulling the right pins, saving characters, and avoiding traps in this exciting pull the pin puzzle game. If you enjoy brain games, logic puzzle games, and rescue puzzle games, this game is perfect for you.",
-    "instructions": "Mouse click or tap to play",
-    "url": "https://play.js13kgames.com/triangle-back-to-home/",
-    "category": "Hypercasual",
-    "tags": "2026 games, amazing, Casual, Fun, Hypercasual, Pinball",
-    "thumb": "https://img.gamemonetize.com/tga2wl51a1f9uf5ai8gf85qu7snikcjt/512x384.jpg",
-    "width": "800",
-    "height": "600"
-  }
+<script>
+// Extrae video ID de URLs de YouTube
+function getYoutubeVideoId(url) {
+    if (!url) return null;
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+        /^([a-zA-Z0-9_-]{11})$/
     ];
-
-    const container = document.getElementById("games");
-    const modal = document.getElementById("gameModal");
-    const gameFrame = document.getElementById("gameFrame");
-    const closeModal = document.getElementById("closeModal");
-
-    let lastFocusedElement = null; // Guarda qué elemento tenía el foco antes de abrir un juego
-
-    // Crear tarjetas con la propiedad tabindex para que sean enfocables
-    games.forEach((game, index) => {
-      const card = document.createElement("div");
-      card.className = "game-card";
-      card.setAttribute("tabindex", "0"); // Permite enfocar con el control remoto
-      card.innerHTML = `
-        <img src="${game.img}" alt="${game.title}" loading="lazy"/>
-        <div class="title">${game.title}</div>
-      `;
-      
-      // Lanzamiento del juego
-      const launchGame = () => {
-        lastFocusedElement = document.activeElement; // Almacena el foco actual
-        gameFrame.src = game.url;
-        modal.style.display = "flex";
-        closeModal.focus(); // Mueve el foco al botón cerrar para que sea fácil salir
-      };
-
-      card.addEventListener("click", launchGame);
-      
-      // Permitir abrir con la tecla ENTER del control remoto
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          launchGame();
-        }
-      });
-
-      container.appendChild(card);
-    });
-
-    // Función para cerrar de forma segura el juego y regresar el foco al panel
-    function closeActiveGame() {
-      modal.style.display = "none";
-      gameFrame.src = "";
-      if (lastFocusedElement) {
-        lastFocusedElement.focus(); // Devuelve el foco al juego que estaba seleccionado
-      }
+    for (let pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) return match[1];
     }
+    return null;
+}
 
-    closeModal.addEventListener("click", closeActiveGame);
-    closeModal.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        closeActiveGame();
-      }
-    });
+// Convierte URL de YouTube a embed
+function youtubeWatchToEmbed(url) {
+    const videoId = getYoutubeVideoId(url);
+    if (!videoId) return null;
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&modestbranding=1`;
+}
 
-    // Cerrar al hacer clic fuera del modal (para dispositivos con mouse)
-    window.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeActiveGame();
-      }
-    });
+// ====================== CANALES ======================
+const LIVE_CHANNELS = [
+    { id: "natgeo", title: "NATIONAL GEOGRAPHIC", poster: "https://i.imgur.com/pVCAztn.jpeg", url: "https://www.youtube.com/watch?v=wVd836vHl6s", type: "youtube" },
+    { id: "n_foro", title: "N+ FORO", poster: "https://i.imgur.com/pmt4om3.jpeg", url: "https://www.youtube.com/watch?v=p2AzyIEuFak", type: "youtube" },
+    { id: "mansion_vip", title: "LA MANSION VIP", poster: "https://i.imgur.com/YcQZe3q.jpeg", url: "https://www.youtube.com/watch?v=SY07oPHXblg", type: "youtube" },
+    { id: "dw_espanol", title: "DW Español", poster: "https://i.imgur.com/rLZEwU8.jpeg", url: "https://www.youtube.com/watch?v=yZh3xsFqCt8", type: "youtube" },
+    { id: "telemundo", title: "Telemundo", poster: "https://i.imgur.com/WIxKWqd.jpeg", url: "https://www.youtube.com/watch?v=c660thEPeeY", type: "youtube" },
+    { id: "fifa", title: "FIFA+", poster: "https://i.imgur.com/D8QLdJx.jpeg", url: "https://www.youtube.com/watch?v=kMNm9L0TM1w", type: "youtube" },
+    { id: "tv5monde", title: "TV5MONDE", poster: "https://i.imgur.com/MfR2BhX.jpeg", url: "https://www.youtube.com/watch?v=b4tE5aKhtlg", type: "youtube" },
+    { id: "cnbc", title: "CNBC", poster: "https://i.imgur.com/or4kB1R.jpeg", url: "https://www.youtube.com/watch?v=ys7QuChSaLA", type: "youtube" },
+   
+    {
+        id: "tele_barn",
+        title: "TELE BÁRN", 
+        poster: "https://i.imgur.com/yis4MU0.jpeg", 
+        url: "https://www.youtube.com/watch?v=XQLEvieRMj4", 
+        type: "youtube"
+        },
+        {
+  id: "ytlive05",
+  title: "Live Music & Relax Stream",
+  poster: "https://imgur.com/pcP3z5h.jpg",
+  url: "https://www.youtube.com/watch?v=vGPBYPx8eNc",
+  type: "youtube"
+},{
+  id: "ytlive06",
+  title: "Live Stream HD",
+  poster: "https://i.ytimg.com/vi/Im6zFFXNW7k/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=Im6zFFXNW7k",
+  type: "youtube"
+},
+{
+  id: "ytlive07",
+  title: "Canal En Vivo HD",
+  poster: "https://i.ytimg.com/vi/WUDI-K0QH_U/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=tZwgyEXtKoI",
+  type: "youtube"
+},
+    { 
+        id: "cbs",
+        title: "CBS NEWS", 
+        poster: "https://i.imgur.com/3vCslJ3.jpeg", 
+        url: "https://www.youtube.com/watch?v=OAqh7KV-r3I",
+        type: "youtube" },
+    
+      {
+  id:"ytlive1",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/_-Qg5jD-PfA/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=_-Qg5jD-PfA",
+  type:"youtube"
+},
+{
+  id:"ytlive2",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ADXWeM9wsDw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ADXWeM9wsDw",
+  type:"youtube"
+},
+{
+  id:"ytlive3",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/4WSVB8B9VCw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=4WSVB8B9VCw",
+  type:"youtube"
+},
+{
+  id:"ytlive4",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/UDvdKUj74cQ/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=UDvdKUj74cQ",
+  type:"youtube"
+},
+{
+  id:"ytlive5",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/EZbWqlw0sK4/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=f7PA6Gjc7ME",
+  type:"youtube"
+},
 
-    // --- SISTEMA DE NAVEGACIÓN D-PAD (CONTROL REMOTO DE TV) ---
-    // Detecta las columnas dinámicamente según el tamaño de la pantalla
-    function getColumnsCount() {
-      const cards = document.querySelectorAll(".game-card");
-      if (cards.length === 0) return 1;
-      const firstRowTop = cards[0].offsetTop;
-      let cols = 0;
-      for (let i = 0; i < cards.length; i++) {
-        if (cards[i].offsetTop === firstRowTop) {
-          cols++;
-        } else {
-          break;
-        }
-      }
-      return cols || 1;
+{
+  id:"ytlive6",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/cb12KmMMDJA/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=cb12KmMMDJA",
+  type:"youtube"
+},
+{
+  id:"ytlive7",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/U9gigT3Z8GU/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=U9gigT3Z8GU",
+  type:"youtube"
+},
+ 
+ {
+  id:"ytlive8",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/VTL9FJylNJY/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=VTL9FJylNJY",
+  type:"youtube"
+},
+{
+  id:"ytlive9",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/5zcVfWXbus0/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=5zcVfWXbus0",
+  type:"youtube"
+},
+
+{
+  id:"ytlive10",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ITBtNXd5WJs/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ITBtNXd5WJs",
+  type:"youtube"
+},
+{
+  id:"ytlive11",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ArKbAx1K-2U/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ArKbAx1K-2U",
+  type:"youtube"
+},
+
+{
+  id:"ytlive12",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/32mBptivjPw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=32mBptivjPw",
+  type:"youtube"
+},
+{
+  id:"ytlive13",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/2rR3K23z3b0/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=2rR3K23z3b0",
+  type:"youtube"
+},
+
+{
+  id:"ytlive14",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/HfgIFGbdGJ0/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=HfgIFGbdGJ0",
+  type:"youtube"
+},
+
+{
+  id:"ytlive15",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/hhcm7NMcPjc/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=hhcm7NMcPjc",
+  type:"youtube"
+},
+
+{
+  id:"ytlive16",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/iW3dacPNKP8/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=iW3dacPNKP8",
+  type:"youtube"
+},
+
+{
+  id:"ytlive17",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/htd8gKYYEFM/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=htd8gKYYEFM",
+  type:"youtube"
+},
+
+{
+  id:"ytlive18",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/RHUauMcYlX0/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=RHUauMcYlX0",
+  type:"youtube"
+},
+
+{
+  id:"ytlive19",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/kmDfG8aaifA/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=kmDfG8aaifA",
+  type:"youtube"
+},
+
+{
+  id:"ytlive20",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/P-Q13_WJBdE/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=P-Q13_WJBdE",
+  type:"youtube"
+},
+
+{
+  id:"ytlive21",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/lyTaabST0Hg/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=lyTaabST0Hg",
+  type:"youtube"
+},
+
+{
+  id:"ytlive22",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/vCuQb6Kv7DM/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=vCuQb6Kv7DM",
+  type:"youtube"
+},
+{
+  id:"ytlive23",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/4MoETv_RYqs/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=4MoETv_RYqs",
+  type:"youtube"
+},
+
+{
+  id:"ytlive24",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/91RbCzAna4U/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=91RbCzAna4U",
+  type:"youtube"
+},
+
+{
+  id:"ytlive25",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/V6RlyFXQu6I/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=V6RlyFXQu6I",
+  type:"youtube"
+},
+
+{
+  id:"ytlive26",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ItoNVjSmkx0/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ItoNVjSmkx0",
+  type:"youtube"
+},
+
+{
+  id:"ytlive27",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/yT5Jx87JIGk/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=yT5Jx87JIGk",
+  type:"youtube"
+},
+
+{
+  id:"ytlive28",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/nndzeKDSjuc/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=nndzeKDSjuc",
+  type:"youtube"
+},
+
+{
+  id:"ytlive29",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/XhAYcYpPzTc/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=XhAYcYpPzTc",
+  type:"youtube"
+},
+
+{
+  id:"ytlive30",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/JC7f3EUDaqw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=JC7f3EUDaqw",
+  type:"youtube"
+},
+
+{
+  id:"ytlive31",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/wrWTcYqHFbw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=wrWTcYqHFbw",
+  type:"youtube"
+},
+
+{
+  id:"ytlive32",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/iOEivs314ME/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=iOEivs314ME",
+  type:"youtube"
+},
+
+{
+  id:"ytlive33",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/06dm2HAebC0/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=06dm2HAebC0",
+  type:"youtube"
+},
+
+{
+  id:"ytlive34",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/G43NInZfoPE/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=G43NInZfoPE",
+  type:"youtube"
+},
+
+{
+  id:"ytlive36",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/iiRNq1sxr0U/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=iiRNq1sxr0U",
+  type:"youtube"
+},
+
+{
+  id:"ytlive37",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/8abNZunCgUM/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=8abNZunCgUM",
+  type:"youtube"
+},
+
+{
+  id:"ytlive38",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/QKBJx_gpr9w/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=QKBJx_gpr9w",
+  type:"youtube"
+},
+
+{
+  id:"ytlive39",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/UiODxV3h97Y/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=UiODxV3h97Y",
+  type:"youtube"
+},
+
+{
+  id:"ytlive40",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/uwQ7abWT_1Q/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=uwQ7abWT_1Q",
+  type:"youtube"
+},
+
+{
+  id:"ytlive41",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/dq4nIKmTfiw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=dq4nIKmTfiw",
+  type:"youtube"
+},
+
+{
+  id:"ytlive42",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/yzKTO-6KWHU/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=yzKTO-6KWHU",
+  type:"youtube"
+},
+
+{
+  id:"ytlive43",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/C6hI2WB3wH8/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=C6hI2WB3wH8",
+  type:"youtube"
+},
+
+{
+  id:"ytlive44",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/rJU6YjyUbbE/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=rJU6YjyUbbE",
+  type:"youtube"
+},
+
+{
+  id:"ytlive45",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/_lpCkEHwmkE/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=_lpCkEHwmkE",
+  type:"youtube"
+},
+
+{
+  id:"ytlive46",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/rGaRCYxyRk8/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=rGaRCYxyRk8",
+  type:"youtube"
+},
+
+{
+  id:"ytlive47",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/GaEBcLZHqTI/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=GaEBcLZHqTI",
+  type:"youtube"
+},
+
+{
+  id:"ytlive48",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ypfVHZgE-gc/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ypfVHZgE-gc",
+  type:"youtube"
+},
+{
+  id:"ytlive50",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/t0GrpAgdBFI/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=t0GrpAgdBFI",
+  type:"youtube"
+},
+
+{
+  id:"ytlive51",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/Dym5Nm5e17c/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=Dym5Nm5e17c",
+  type:"youtube"
+},
+
+{
+  id:"ytlive52",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/q2Dxx5704fQ/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=q2Dxx5704fQ",
+  type:"youtube"
+},
+
+{
+  id:"ytlive53",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/15pVqwQb7A0/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=15pVqwQb7A0",
+  type:"youtube"
+},
+
+{
+  id:"ytlive54",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/WhIe9Qb2zl8/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=WhIe9Qb2zl8",
+  type:"youtube"
+},
+
+{
+  id:"ytlive55",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ZvYvZLfPatQ/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ZvYvZLfPatQ",
+  type:"youtube"
+},
+
+{
+  id:"ytlive56",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/cmkAbDUEoyA/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=cmkAbDUEoyA",
+  type:"youtube"
+},
+
+{
+  id:"ytlive57",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/VM18f-IIUTw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=VM18f-IIUTw",
+  type:"youtube"
+},
+
+{
+  id:"ytlive58",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/sWasdbDVNvc/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=sWasdbDVNvc",
+  type:"youtube"
+},
+
+{
+  id:"ytlive59",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/WtoxxHADnGk/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=WtoxxHADnGk",
+  type:"youtube"
+},
+
+{
+  id:"ytlive60",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/Ea48y09PuNc/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=Ea48y09PuNc",
+  type:"youtube"
+},
+
+{
+  id:"ytlive61",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/tAWFO8_O_7M/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=tAWFO8_O_7M",
+  type:"youtube"
+},
+
+{
+  id:"ytlive62",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/VGnFLdQW39A/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=VGnFLdQW39A",
+  type:"youtube"
+},
+
+{
+  id:"ytlive63",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/HghxOQ12dy4/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=HghxOQ12dy4",
+  type:"youtube"
+},
+
+{
+  id:"ytlive64",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/hb_nPVSnNqw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=hb_nPVSnNqw",
+  type:"youtube"
+},
+
+{
+  id:"ytlive65",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/_rmUXOHSf0w/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=_rmUXOHSf0w",
+  type:"youtube"
+},
+{
+  id:"ytlive66",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/8JCk5M_xrBs/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=8JCk5M_xrBs",
+  type:"youtube"
+},
+
+{
+  id:"ytlive67",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/E2gGh3BEhEA/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=E2gGh3BEhEA",
+  type:"youtube"
+},
+
+{
+  id:"ytlive68",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/5uZa3-RMFos/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=5uZa3-RMFos",
+  type:"youtube"
+},
+
+{
+  id:"ytlive69",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ulextwSHPeA/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ulextwSHPeA",
+  type:"youtube"
+},
+
+{
+  id:"ytlive70",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/M6kN1wlNSk4/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=M6kN1wlNSk4",
+  type:"youtube"
+},
+
+{
+  id:"ytlive71",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/Gvyjii-8ILU/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=Gvyjii-8ILU",
+  type:"youtube"
+},
+
+{
+  id:"ytlive72",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/UXrI37An2Eo/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=UXrI37An2Eo",
+  type:"youtube"
+},
+
+{
+  id:"ytlive73",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/s5wFtOvlaJ8/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=s5wFtOvlaJ8",
+  type:"youtube"
+},
+
+{
+  id:"ytlive74",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ipx4NFAFyjk/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ipx4NFAFyjk",
+  type:"youtube"
+},
+
+{
+  id:"ytlive75",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/RVLqQtrbCT8/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=RVLqQtrbCT8",
+  type:"youtube"
+},
+
+{
+  id:"ytlive76",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/VnsRQvfv_g4/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=VnsRQvfv_g4",
+  type:"youtube"
+},
+
+{
+  id:"ytlive77",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/whZHMbZqRFk/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=whZHMbZqRFk",
+  type:"youtube"
+},
+
+{
+  id:"ytlive78",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/7-XBRpKSv4Q/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=7-XBRpKSv4Q",
+  type:"youtube"
+},
+
+{
+  id:"ytlive79",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/xBQXC3kVvps/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=xBQXC3kVvps",
+  type:"youtube"
+},
+
+{
+  id:"ytlive80",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/pN5tc1XIhAo/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=pN5tc1XIhAo",
+  type:"youtube"
+},
+
+{
+  id:"ytlive81",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/c6JAn-IGX6o/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=c6JAn-IGX6o",
+  type:"youtube"
+},
+
+{
+  id:"ytlive82",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/QgsJr1vovH0/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=QgsJr1vovH0",
+  type:"youtube"
+},
+
+{
+  id:"ytlive83",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/rxBBRLWF0mM/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=rxBBRLWF0mM",
+  type:"youtube"
+},
+
+{
+  id:"ytlive84",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/qx7gry390YA/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=qx7gry390YA",
+  type:"youtube"
+},
+
+{
+  id:"ytlive85",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/k0F4jTkhklI/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=k0F4jTkhklI",
+  type:"youtube"
+},
+{
+  id:"ytlive87",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/fYnqzWV0M2g/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=fYnqzWV0M2g",
+  type:"youtube"
+},
+
+{
+  id:"ytlive88",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/QKBJx_gpr9w/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=QKBJx_gpr9w",
+  type:"youtube"
+},
+
+{
+  id:"ytlive89",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/y72FK-sM0hk/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=y72FK-sM0hk",
+  type:"youtube"
+},
+
+{
+  id:"ytlive90",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/rvtygG4n6ew/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=rvtygG4n6ew",
+  type:"youtube"
+},
+
+{
+  id:"ytlive91",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/-Lp7wi90h9M/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=-Lp7wi90h9M",
+  type:"youtube"
+},
+
+{
+  id:"ytlive92",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/0IGLf-hQTwI/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=0IGLf-hQTwI",
+  type:"youtube"
+},
+
+{
+  id:"ytlive93",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/9mg9PoFEX2U/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=9mg9PoFEX2U",
+  type:"youtube"
+},
+
+{
+  id:"ytlive94",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/aPGvK6tJMXk/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=aPGvK6tJMXk",
+  type:"youtube"
+},
+
+{
+  id:"ytlive95",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/hwROtLQDO_s/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=hwROtLQDO_s",
+  type:"youtube"
+},
+
+{
+  id:"ytlive96",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/56llPN9tS88/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=56llPN9tS88",
+  type:"youtube"
+},
+
+{
+  id:"ytlive97",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/SM21NTsTHXY/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=SM21NTsTHXY",
+  type:"youtube"
+},
+
+{
+  id:"ytlive98",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/vBHcbT-BhFE/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=vBHcbT-BhFE",
+  type:"youtube"
+},
+
+{
+  id:"ytlive99",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/VrhYz4CL70I/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=VrhYz4CL70I",
+  type:"youtube"
+},
+
+{
+  id:"ytlive100",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/z5kh_v4D2o8/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=z5kh_v4D2o8",
+  type:"youtube"
+},
+
+{
+  id:"ytlive101",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/SiflAbFG_HI/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=SiflAbFG_HI",
+  type:"youtube"
+},
+
+{
+  id:"ytlive102",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/XghNs0Cx6JQ/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=XghNs0Cx6JQ",
+  type:"youtube"
+},
+
+{
+  id:"ytlive103",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/H5e6PssMMcE/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=H5e6PssMMcE",
+  type:"youtube"
+},
+
+{
+  id:"ytlive104",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/4WSVB8B9VCw/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=4WSVB8B9VCw",
+  type:"youtube"
+},
+
+{
+  id:"ytlive105",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/hNf5__nxw5s/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=hNf5__nxw5s",
+  type:"youtube"
+},
+
+{
+  id:"ytlive106",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/ETzieuDNZwU/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=ETzieuDNZwU",
+  type:"youtube"
+},
+
+{
+  id:"ytlive107",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/oV5gVoZQ7xU/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=oV5gVoZQ7xU",
+  type:"youtube"
+},
+
+{
+  id:"ytlive108",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/DWPcQ4VlauY/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=DWPcQ4VlauY",
+  type:"youtube"
+},
+
+{
+  id:"ytlive109",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/HHp4rjhJsWI/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=HHp4rjhJsWI",
+  type:"youtube"
+},
+{
+  id: "ytlive01",
+  title: "Video 1",
+  poster: "https://i.ytimg.com/vi/0FBiyFpV__g/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=0FBiyFpV__g",
+  type: "youtube"
+},
+{
+  id: "ytlive02",
+  title: "Video 2",
+  poster: "https://i.ytimg.com/vi/jUCIORHC_gM/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=jUCIORHC_gM",
+  type: "youtube"
+},
+{
+  id: "ytlive03",
+  title: "Video 3",
+  poster: "https://i.ytimg.com/vi/R8MRTG0pYdc/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=R8MRTG0pYdc",
+  type: "youtube"
+},
+{
+  id: "ytlive04",
+  title: "Video 4",
+  poster: "https://i.ytimg.com/vi/XYdZPXiQMXs/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=XYdZPXiQMXs",
+  type: "youtube"
+},
+{
+  id: "ytlive05",
+  title: "Video 5",
+  poster: "https://i.ytimg.com/vi/e9C9K8ltDfk/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=e9C9K8ltDfk",
+  type: "youtube"
+},
+{
+  id: "ytlive06",
+  title: "Video 6",
+  poster: "https://i.ytimg.com/vi/ZYr0ulJDXCE/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=ZYr0ulJDXCE",
+  type: "youtube"
+},
+{
+  id: "ytlive07",
+  title: "Video 7",
+  poster: "https://i.ytimg.com/vi/QKBJx_gpr9w/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=QKBJx_gpr9w",
+  type: "youtube"
+},
+{
+  id: "ytlive08",
+  title: "Video 8",
+  poster: "https://i.ytimg.com/vi/tEtg5Kg3voQ/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=tEtg5Kg3voQ",
+  type: "youtube"
+},
+{
+  id: "ytlive09",
+  title: "Video 9",
+  poster: "https://i.ytimg.com/vi/m1XcdxjVGos/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=m1XcdxjVGos",
+  type: "youtube"
+},
+{
+  id: "ytlive10",
+  title: "Video 10",
+  poster: "https://i.ytimg.com/vi/YGFQOHMz6G4/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=YGFQOHMz6G4",
+  type: "youtube"
+},
+{
+  id:"ytlive86",
+  title:"YouTube Live",
+  poster:"https://i.ytimg.com/vi/Q71sLS8h9a4/maxresdefault.jpg",
+  url:"https://www.youtube.com/watch?v=Q71sLS8h9a4",
+  type:"youtube"
+},
+    
+    { id: "c5n", title: "C5N", poster: "https://i.imgur.com/2sk5y5e.jpeg", url: "https://www.youtube.com/watch?v=izMS1aAj6yY", type: "youtube" }
+];
+
+// ====================== ESTADO GLOBAL ======================
+let STATE = {
+    channelsList: LIVE_CHANNELS,
+    focusElement: null,
+    currentGridIndex: -1,
+    gridCols: 0,
+    view: "home",
+    lastFocusInHome: null,
+    imgObserver: null,
+    currentMediaType: null
+};
+
+// Elementos DOM
+const DOM = {
+    logo: document.getElementById('logo'),
+    stats: document.getElementById('stats'),
+    main: document.getElementById('main'),
+    grid: document.getElementById('grid'),
+    player: document.getElementById('player'),
+    playerContent: document.getElementById('playerContent'),
+    vid: document.getElementById('vid'),
+    ytPlayer: document.getElementById('ytPlayer'),
+    pUi: document.getElementById('pUi'),
+    pTitle: document.getElementById('pTitle'),
+    pLoad: document.getElementById('pLoad'),
+    pLoadTxt: document.getElementById('pLoadTxt'),
+    pErr: document.getElementById('pErr'),
+    pErrTxt: document.getElementById('pErrTxt'),
+    pInd: document.getElementById('pInd'),
+    pBar: document.getElementById('pBar'),
+    pFill: document.getElementById('pFill'),
+    pBuf: document.getElementById('pBuf'),
+    pCur: document.getElementById('pCur'),
+    pDur: document.getElementById('pDur'),
+    pProgContainer: document.getElementById('pProgContainer'),
+    pRw: document.getElementById('pRw'),
+    pPp: document.getElementById('pPp'),
+    pFw: document.getElementById('pFw'),
+    pRetry: document.getElementById('pRetry'),
+    pBack: document.getElementById('pBack')
+};
+
+function esc(s) { return s ? String(s).replace(/[&<>"']/g, c => ({ '&':'&', '<':'<', '>':'>', '"':'"', "'":"'" })[c]) : ''; }
+function fmtTime(s) { if(!s||!isFinite(s)) return '0:00'; const h=~~(s/3600), m=~~(s%3600/60), ss=~~(s%60); return h? h+':'+String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0') : m+':'+String(ss).padStart(2,'0'); }
+
+function calculateGridCols() {
+    const grid = DOM.grid;
+    if(!grid.children.length) { STATE.gridCols = 0; return; }
+    const first = grid.children[0];
+    const rect = first.getBoundingClientRect();
+    let cols = 1;
+    for(let i=1; i<grid.children.length; i++) {
+        if(Math.abs(grid.children[i].getBoundingClientRect().top - rect.top) < 10) cols++;
+        else break;
     }
+    STATE.gridCols = Math.max(1, cols);
+}
 
-    // Escuchar eventos del teclado / control remoto de la TV
-    window.addEventListener("keydown", (e) => {
-      const active = document.activeElement;
-      
-      // Si el modal del juego está abierto
-      if (modal.style.display === "flex") {
-        // Al presionar BACKSPACE o ESCAPE en el control remoto, cierra el juego de inmediato
-        if (e.key === "Backspace" || e.key === "Escape" || e.keyCode === 8 || e.keyCode === 27 || e.keyCode === 10009) {
-          e.preventDefault();
-          closeActiveGame();
+function loadImageWithAnimation(img) {
+    if(!img.dataset.src || img.classList.contains('loaded')) return;
+    const src = img.dataset.src;
+    const temp = new Image();
+    temp.onload = () => { img.src = src; img.classList.add('loaded'); img.style.background='none'; };
+    temp.onerror = () => { img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="80"%3E%3Crect width="200" height="80" fill="%231a1a1a"/%3E%3Ctext x="100" y="45" fill="%23888" text-anchor="middle" font-size="12"%3E📺%3C/text%3E%3C/svg%3E'; img.classList.add('loaded'); };
+    temp.src = src;
+}
+
+function initLazyLoad() {
+    if(STATE.imgObserver) STATE.imgObserver.disconnect();
+    STATE.imgObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => { if(entry.isIntersecting) { loadImageWithAnimation(entry.target); STATE.imgObserver.unobserve(entry.target); } });
+    }, { rootMargin: "300px 0px", threshold: 0.01 });
+    document.querySelectorAll('.card img[data-src]').forEach(img => STATE.imgObserver.observe(img));
+}
+
+function renderGrid(items) {
+    DOM.grid.innerHTML = '';
+    if(!items.length) { DOM.grid.innerHTML = '<div class="msg">📭 Sin canales disponibles</div>'; return; }
+    items.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.tabIndex = -1;
+        const poster = item.poster || "https://via.placeholder.com/300x120?text=TV";
+        const title = item.title || "Sin título";
+        card.innerHTML = `<img data-src="${esc(poster)}" alt="${esc(title)}"><div class="card-t">${esc(title)}</div>`;
+        card.onclick = () => { playMedia(item, idx); };
+        DOM.grid.appendChild(card);
+    });
+    initLazyLoad();
+    setTimeout(() => { calculateGridCols(); if(STATE.currentGridIndex === -1 && items.length) setFocusGrid(0); }, 50);
+}
+
+// ====================== REPRODUCTOR ======================
+function playMedia(media, idx) {
+    if(STATE.view === "player") closePlayer();
+    STATE.view = "player";
+    STATE.lastFocusInHome = STATE.focusElement;
+    history.pushState({v:'player'},'','#player');
+    DOM.player.classList.add('open');
+    DOM.pTitle.textContent = media.title;
+    DOM.pErr.classList.remove('show');
+    DOM.pLoad.classList.add('show');
+    DOM.pLoadTxt.textContent = "Cargando stream...";
+    
+    // Limpiar reproductor anterior
+    DOM.vid.pause();
+    DOM.vid.removeAttribute('src');
+    DOM.ytPlayer.innerHTML = '';
+    DOM.vid.style.display = 'none';
+    DOM.ytPlayer.style.display = 'none';
+    
+    if (media.type === "youtube" || media.url.includes('youtube.com/watch') || media.url.includes('youtu.be/')) {
+        STATE.currentMediaType = 'youtube';
+        const embedUrl = youtubeWatchToEmbed(media.url);
+        if (!embedUrl) {
+            showPlayerError(new Error("URL de YouTube inválida"));
+            return;
         }
-        return; // Detiene la navegación del catálogo mientras se juega
-      }
+        
+        DOM.ytPlayer.style.display = 'flex';
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen";
+        iframe.allowFullscreen = true;
+        iframe.addEventListener('load', () => {
+            DOM.pLoad.classList.remove('show');
+            setTimeout(() => iframe.focus(), 100);
+        });
+        iframe.addEventListener('error', () => {
+            showPlayerError(new Error("No se pudo cargar el video de YouTube"));
+        });
+        DOM.ytPlayer.appendChild(iframe);
+        
+        // Ocultar controles de video
+        DOM.pProgContainer.style.display = 'none';
+        DOM.pRw.style.display = 'none';
+        DOM.pPp.style.display = 'none';
+        DOM.pFw.style.display = 'none';
+    } else {
+        STATE.currentMediaType = 'video';
+        DOM.vid.style.display = 'block';
+        
+        // Mostrar controles de video
+        DOM.pProgContainer.style.display = 'flex';
+        DOM.pRw.style.display = 'block';
+        DOM.pPp.style.display = 'block';
+        DOM.pFw.style.display = 'block';
+        
+        DOM.vid.src = media.url;
+        DOM.vid.play().catch(e => { 
+            if(e.name !== 'NotAllowedError') showPlayerError(e); 
+        });
+    }
+}
 
-      const cards = Array.from(document.querySelectorAll(".game-card"));
-      const currentIndex = cards.indexOf(active);
+function showPlayerError(err) {
+    DOM.pLoad.classList.remove('show');
+    DOM.pErr.classList.add('show');
+    DOM.pErrTxt.textContent = err.message || 'Error al reproducir';
+}
 
-      if (currentIndex === -1) {
-        // Si no hay ningún elemento enfocado, enfoca la primera tarjeta al presionar cualquier flecha
-        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-          if (cards.length > 0) cards[0].focus();
+function closePlayer() {
+    DOM.player.classList.remove('open');
+    DOM.vid.pause();
+    DOM.vid.removeAttribute('src');
+    DOM.ytPlayer.innerHTML = '';
+    DOM.vid.style.display = 'none';
+    DOM.ytPlayer.style.display = 'none';
+    STATE.view = "home";
+    STATE.currentMediaType = null;
+    history.back();
+    setTimeout(() => {
+        if(STATE.lastFocusInHome && document.body.contains(STATE.lastFocusInHome)) 
+            STATE.lastFocusInHome.classList.add('f');
+        else setFocusGrid(0);
+    }, 80);
+}
+
+// Eventos reproductor (solo para video)
+DOM.vid.oncanplay = () => { if(STATE.currentMediaType === 'video') DOM.pLoad.classList.remove('show'); };
+DOM.vid.onwaiting = () => { if(STATE.currentMediaType === 'video') { DOM.pLoad.classList.add('show'); DOM.pLoadTxt.textContent = 'Buffering...'; } };
+DOM.vid.ontimeupdate = () => { if(DOM.vid.duration) DOM.pFill.style.width = (DOM.vid.currentTime / DOM.vid.duration * 100) + '%'; DOM.pCur.textContent = fmtTime(DOM.vid.currentTime); };
+DOM.vid.ondurationchange = () => { DOM.pDur.textContent = fmtTime(DOM.vid.duration); };
+DOM.vid.onprogress = () => { if(DOM.vid.buffered.length) DOM.pBuf.style.width = (DOM.vid.buffered.end(DOM.vid.buffered.length-1)/DOM.vid.duration*100)+'%'; };
+DOM.vid.onerror = () => { showPlayerError(DOM.vid.error); };
+
+DOM.pPp.onclick = () => { if(STATE.currentMediaType === 'video') { if(DOM.vid.paused) DOM.vid.play(); else DOM.vid.pause(); } };
+DOM.pRw.onclick = () => { if(STATE.currentMediaType === 'video' && DOM.vid.duration) DOM.vid.currentTime = Math.max(0, DOM.vid.currentTime-10); };
+DOM.pFw.onclick = () => { if(STATE.currentMediaType === 'video' && DOM.vid.duration) DOM.vid.currentTime = Math.min(DOM.vid.duration, DOM.vid.currentTime+10); };
+DOM.pBar.onclick = e => { if(STATE.currentMediaType === 'video' && DOM.vid.duration) { const rect = DOM.pBar.getBoundingClientRect(); DOM.vid.currentTime = ((e.clientX - rect.left)/rect.width) * DOM.vid.duration; } };
+DOM.pRetry.onclick = () => { location.reload(); };
+DOM.pBack.onclick = closePlayer;
+
+// Navegación
+function getCards() { return [...DOM.grid.querySelectorAll('.card')]; }
+function setFocusGrid(idx) {
+    const cards = getCards();
+    if(!cards.length) return;
+    if(idx<0) idx=0; if(idx>=cards.length) idx=cards.length-1;
+    if(STATE.focusElement && STATE.focusElement.classList) STATE.focusElement.classList.remove('f');
+    STATE.currentGridIndex = idx;
+    STATE.focusElement = cards[idx];
+    STATE.focusElement.classList.add('f');
+    const rect = STATE.focusElement.getBoundingClientRect(), mainRect = DOM.main.getBoundingClientRect();
+    if(rect.top < mainRect.top || rect.bottom > mainRect.bottom) STATE.focusElement.scrollIntoView({block:'nearest', behavior:'smooth'});
+}
+
+document.onkeydown = e => {
+    const k = e.key;
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Enter',' ','Escape','Backspace'].includes(k)) { e.preventDefault(); e.stopPropagation(); }
+    if(STATE.view === 'player') {
+        if(STATE.currentMediaType === 'video') {
+            if(k === 'ArrowLeft') DOM.pRw.click();
+            else if(k === 'ArrowRight') DOM.pFw.click();
+            else if(k === 'Enter' || k === ' ') DOM.pPp.click();
+        }
+        if(k === 'Escape' || k === 'Backspace') closePlayer();
+        return;
+    }
+    if(k === 'Enter' || k === ' ') {
+        if(STATE.focusElement === DOM.logo) location.reload();
+        else if(STATE.focusElement && STATE.focusElement.classList.contains('card')) {
+            const idx = getCards().indexOf(STATE.focusElement);
+            if(idx>=0 && STATE.channelsList[idx]) playMedia(STATE.channelsList[idx], idx);
         }
         return;
-      }
-
-      const cols = getColumnsCount();
-      let nextIndex = currentIndex;
-
-      switch (e.key) {
-        case "ArrowLeft":
-          if (currentIndex % cols !== 0) {
-            nextIndex = currentIndex - 1;
-          }
-          break;
-        case "ArrowRight":
-          if ((currentIndex + 1) % cols !== 0 && currentIndex + 1 < cards.length) {
-            nextIndex = currentIndex + 1;
-          }
-          break;
-        case "ArrowUp":
-          if (currentIndex - cols >= 0) {
-            nextIndex = currentIndex - cols;
-          }
-          break;
-        case "ArrowDown":
-          if (currentIndex + cols < cards.length) {
-            nextIndex = currentIndex + cols;
-          }
-          break;
-        default:
-          return; // No interviene en otras teclas
-      }
-
-      if (nextIndex !== currentIndex) {
-        e.preventDefault();
-        cards[nextIndex].focus();
-        // Asegura que la TV haga scroll automático para mantener visible el elemento enfocado
-        cards[nextIndex].scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-    });
-
-    // Autofoco inicial en la primera tarjeta al cargar la web en la TV
-    window.addEventListener("load", () => {
-      const firstCard = document.querySelector(".game-card");
-      if (firstCard) {
-        firstCard.focus();
-      }
-    });
-  </script>
-  
-  <script>
-    // Registro de interacción humana de manera segura
-    let isHuman = false;
-
-    function markAsHuman() {
-      if (!isHuman) {
-        isHuman = true;
-        console.log("✅ Usuario real detectado");
-        sendHumanVisit();
-      }
     }
-
-    window.addEventListener("mousemove", markAsHuman);
-    window.addEventListener("keydown", markAsHuman);
-    window.addEventListener("scroll", markAsHuman);
-    window.addEventListener("click", markAsHuman);
-
-    function sendHumanVisit() {
-      fetch("/human-visit", {   
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ human: true, time: Date.now() })
-      }).catch(err => {
-        // Control silencioso del error por si no existe la ruta en su servidor
-        console.log("Registro de visita guardado localmente.");
-      });
+    if(k === 'Escape') { 
+        if(STATE.currentGridIndex >= 0) setFocusGrid(0);
+        return;
     }
-  </script>
- </body>
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k)) {
+        const dir = k.toLowerCase().replace('arrow','');
+        if(STATE.currentGridIndex >= 0) {
+            let newIdx = STATE.currentGridIndex;
+            if(dir === 'up') newIdx = Math.max(0, STATE.currentGridIndex - STATE.gridCols);
+            else if(dir === 'down') newIdx = Math.min(getCards().length-1, STATE.currentGridIndex + STATE.gridCols);
+            else if(dir === 'left') newIdx = Math.max(0, STATE.currentGridIndex-1);
+            else if(dir === 'right') newIdx = Math.min(getCards().length-1, STATE.currentGridIndex+1);
+            if(newIdx !== STATE.currentGridIndex) setFocusGrid(newIdx);
+        }
+    }
+};
+
+// Inicialización
+function init() {
+    renderGrid(STATE.channelsList);
+    DOM.stats.textContent = STATE.channelsList.length + ' canales';
+    setFocusGrid(0);
+    window.addEventListener('resize', () => { setTimeout(calculateGridCols, 100); });
+}
+
+init();
+</script>
+</body>
 </html>
