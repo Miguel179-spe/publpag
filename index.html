@@ -1,190 +1,691 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zona de Juegos HTML5</title>
+  <script>(function(s){s.dataset.zone='9900658',s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+   
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juegosrd.Store</title>
+ 
   <style>
-    /* Estilos estéticos de acuerdo a su panel (Oscuro con toques neón) */
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background-color: #071a24;
-      color: #ffffff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 20px;
+      font-family: 'Arial', sans-serif;
+      background-color: #121212; /* Fondo más oscuro para evitar fatiga visual en TVs */
+      color: #fff;
+      padding: 3% 5%; /* "Safe zone" para evitar que los bordes se corten en algunas TVs (Overscan) */
+    }
+
+    header {
+      background-color: #1e1e1e;
+      color: #00ffff;
+      padding: 15px;
+      text-align: center;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     }
 
     h1 {
-      text-align: center;
-      color: #00ffff;
-      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-      margin-bottom: 30px;
+      margin: 0;
+      font-size: 32px;
     }
 
-    /* Contenedor de la cuadrícula */
     .grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
+      padding: 10px 0;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 
-    /* Estilo de las tarjetas de juego */
-    .card {
-      background-color: #0b1e28;
-      border: 2px solid #005b66;
-      border-radius: 12px;
+    /* Tarjetas adaptadas para enfoque de Smart TV */
+    .game-card {
+      background-color: #1e1e1e;
+      border: 3px solid transparent; /* Espacio reservado para el borde de enfoque */
+      border-radius: 20px;
       overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      outline: none; /* Elimina el borde azul por defecto del navegador */
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    /* Efecto visual al navegar con las flechas del control remoto o mouse */
+    .game-card:focus, .game-card:hover {
+      transform: scale(1.08);
       border-color: #00ffff;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+      background-color: #252525;
     }
 
-    /* Contenedor de imagen con relación de aspecto */
-    .card-img-container {
+    .game-card img {
       width: 100%;
-      height: 150px;
-      background-color: #000;
-      position: relative;
-    }
-
-    .card img {
-      width: 100%;
-      height: 100%;
+      height: 180px;
       object-fit: cover;
+      display: block;
     }
 
-    .card-info {
+    .game-card .title {
       padding: 12px;
-      text-align: center;
-    }
-
-    .card-title {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: bold;
-      margin: 0;
+      text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    /* Pantalla completa para el juego (Iframe Overlay) */
-    #game-overlay {
+    /* Modal adaptado a TV */
+    .modal {
       display: none;
       position: fixed;
-      top: 0;
+      z-index: 999;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #000000;
-      z-index: 9999;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.95);
+      justify-content: center;
+      align-items: center;
+      padding: 0;
     }
 
-    /* Iframe que cargará el juego */
-    #game-frame {
+    .modal-content {
+      position: relative;
+      background: #000;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .modal iframe {
       width: 100%;
       height: 100%;
       border: none;
     }
 
-    /* Botón flotante para cerrar el juego */
-    #close-button {
+    /* Botón cerrar más grande y visible en TV */
+    .close-btn {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      background-color: rgba(255, 0, 0, 0.85);
-      color: #ffffff;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 18px;
-      font-size: 14px;
+      top: 20px;
+      right: 25px;
+      color: #fff;
+      font-size: 35px;
       font-weight: bold;
       cursor: pointer;
       z-index: 10000;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-      transition: background-color 0.2s, transform 0.1s;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
     }
 
-    #close-button:hover {
-      background-color: rgba(255, 0, 0, 1);
-      transform: scale(1.05);
+    .close-btn:hover, .close-btn:focus {
+      color: #ff4444;
+      border-color: #ff4444;
+      outline: none;
+    }
+
+    /* RESPONSIVE: Adaptaciones para móviles y pantallas pequeñas */
+    @media (max-width: 600px) {
+      .grid-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      .game-card img {
+        height: 100px;
+      }
+
+      .game-card .title {
+        font-size: 11px;
+        padding: 6px;
+      }
+
+      .game-card {
+        border-radius: 12px;
+      }
     }
   </style>
+  
+  <meta name="monetag" content="7812f82436d0282fbdec6764e2867d02">
 </head>
 <body>
 
-  <h1>ZONA DE JUEGOS</h1>
+  <header>
+    <h1>Juegosrd.Store</h1>
+  </header>
+   
+  <main>
+    <div class="grid-container" id="games">
+      <!-- Tarjetas de juegos dinámicas -->
+    </div>
+  </main>
 
-  <div class="grid-container" id="games-grid">
-    <!-- Las tarjetas se generarán automáticamente aquí -->
-  </div>
-
-  <!-- Contenedor del Juego Activo -->
-  <div id="game-overlay">
-    <button id="close-button" onclick="closeGame()">VOLVER AL PANEL</button>
-    <iframe id="game-frame" src="" allowfullscreen></iframe>
+  <!-- Modal -->
+  <div class="modal" id="gameModal">
+    <div class="modal-content">
+      <!-- Agregamos tabindex para que el botón de cerrar también sea accesible en TV -->
+      <span class="close-btn" id="closeModal" tabindex="0">×</span>
+      <iframe id="gameFrame" src=""></iframe>
+    </div>
   </div>
 
   <script>
-    // Su lista de juegos estructurada
-    const gamesList = [
+    const games = [
       {
-        title: "Toy Car Gear",
-        img: "https://images.gamepix.com/toy-car-gear/thumbnail/medium.png",
-        url: "https://play.gamepix.com/toy-car-gear/embed" // Este enlace SÍ permite iframes
+        title: "Red Sea Patrol",
+        img: "https://imgur.com/fgoWky1.jpg",
+        url: "https://marketjs.cdn.msnfun.com/9n0d984916dp/v7/index.html"
       },
       {
-        title: "Classic Pacman",
-        img: "https://images.gamepix.com/classic-pacman/thumbnail/medium.png",
-        url: "https://play.gamepix.com/classic-pacman/embed"
+        title: "Traffic Control",
+        img: "https://imgur.com/aqYD75U.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9p515mfx8p7z/v5/index.html"
+      },
+      {
+        title: "Carreras Extremas",
+        img: "https://imgur.com/az8ROwO.jpg",
+        url: "https://minefun.io/"
+      },
+      {
+        title: "Bike Racing 1",
+        img: "https://imgur.com/yRZkEK5.jpg",
+        url: "https://softgames.cdn.msnfun.com/9n6fqg02tzms/v9/index.html"
+      },
+      {
+        title: "Bike Racing 1",
+        img: "https://imgur.com/IuGfpYF.jpg",
+        url: "https://softgames.cdn.msnfun.com/9p70lt0zr384/v25/index.html"
+      },
+      {
+        title: "Defensa Galáctica",
+        img: "https://imgur.com/0jWpfpN.jpg",
+        url: "https://crazygames.cdn.msnfun.com/9nvd4v66kdj7/v1/index.html"
+      },
+      {
+        title: "Thief Puzzle",
+        img: "https://imgur.com/YxhGtG2.jpg",
+        url: "https://famobi.cdn.msnfun.com/9njb654d39wx/v10/index.html"
+      },
+      {
+        title: "8 Ball Billiard",
+        img: "https://imgur.com/mMsgARp.jpg",
+        url: "https://famobi.cdn.msnfun.com/9pj2vxj6kcc2/v9/index.html"
+      },
+      {
+        title: "Cut the Rope",
+        img: "https://imgur.com/hz9xIQB.jpg",
+        url: "https://famobi.cdn.msnfun.com/9npxcz4n8jw7/v16/index.html"
+      },
+      {
+        title: "Zoo Boom",
+        img: "https://imgur.com/TiO6HGT.jpg",
+        url: "https://famobi.cdn.msnfun.com/9nfdpvzz2lhb/v12/index.html"
+      },
+      {
+        title: "Train Miner",
+        img: "https://imgur.com/Oq4w8Mt.jpg",
+        url: "https://famobi.cdn.msnfun.com/9p9tcz23xm3x/v7/index.html"
+      },
+      {
+        title: "Western Sniper",
+        img: "https://imgur.com/t67Fqpq.jpg",
+        url: "https://famobi.cdn.msnfun.com/9n2cn30d7w82/v5/index.html"
+      },
+      {
+        title: "Jigsaw Puzzle Deluxe",
+        img: "https://imgur.com/TmQodI0.jpg",
+        url: "https://famobi.cdn.msnfun.com/9n8g2wzlwbdc/v2/index.html"
+      },
+      {
+        title: "Love Tester",
+        img: "https://imgur.com/j34kb0H.jpg",
+        url: "https://famobi.cdn.msnfun.com/9p9gbl4rmgj5/v7/index.html"
+      },
+      {
+        title: "Merge Jewels",
+        img: "https://imgur.com/WbPIANI.jpg",
+        url: "https://famobi.cdn.msnfun.com/9n92dzq21fqz/v5/index.html"
+      },
+      {
+        title: "Totemia: Cursed Marbles",
+        img: "https://imgur.com/KtpQfvt.jpg",
+        url: "https://famobi.cdn.msnfun.com/9n6rxdx77q6p/v6/index.html"
+      },
+      {
+        title: "Speed Master",
+        img: "https://imgur.com/pNxJLrO.jpg",
+        url: "https://famobi.cdn.msnfun.com/9nj7v0n9dwzs/v5/index.html"
+      },
+      {
+        title: "Pull Pins",
+        img: "https://imgur.com/WsKrwcf.jpg",
+        url: "https://famobi.cdn.msnfun.com/9nkm0jm00d91/v5/index.html"
+      },
+      {
+        title: "Perfect Piano",
+        img: "https://imgur.com/BaBLWjB.jpg",
+        url: "https://famobi.cdn.msnfun.com/9nprcsghz6j6/v9/index.html"
+      },
+      {
+        title: "Braindom 2",
+        img: "https://imgur.com/YIxXUaZ.jpg",
+        url: "https://famobi.cdn.msnfun.com/9n5j76kk22fx/v8/index.html"
+      },
+      {
+        title: "Domino Frenzy",
+        img: "https://imgur.com/JeW4sq3.jpg",
+        url: "https://famobi.cdn.msnfun.com/9n3xnt0c9rh6/v5/index.html"
+      },
+      {
+        title: "Fashion Battle",
+        img: "https://imgur.com/GhZkhPp.jpg",
+        url: "https://famobi.cdn.msnfun.com/9phwv8r75q33/v8/index.html"
+      },
+      {
+        title: "Om Nom Connect Christmas",
+        img: "https://imgur.com/NQmUvvf.jpg",
+        url: "https://famobi.cdn.msnfun.com/9ppsrln4bk9d/v4/index.html"
+      },
+      {
+        title: "Element Blocks",
+        img: "https://imgur.com/8d6m9HS.jpg",
+        url: "https://famobi.cdn.msnfun.com/9nrzg7ppvxfl/v6/index.html"
+      },
+      {
+        title: "TNT Bomb",
+        img: "https://imgur.com/FQwBdXX.jpg",
+        url: "https://famobi.cdn.msnfun.com/9mw7mpmt0fxl/v7/index.html"
+      },
+      {
+        title: "Mahjong World",
+        img: "https://imgur.com/e5x6S28.jpg",
+        url: "https://famobi.cdn.msnfun.com/9pjhm2jg35qd/v5/index.html"
+      },
+      {
+        title: "Color Water Sort 3D",
+        img: "https://imgur.com/9dQTmAD.jpg",
+        url: "https://famobi.cdn.msnfun.com/9nmf56pk59n9/v9/index.html"
+      },
+      {
+        title: "Smarty Bubbles",
+        img: "https://imgur.com/jtKYuQ9.jpg",
+        url: "https://famobi.cdn.msnfun.com/9mw7436chmgk/v12/index.html"
+      },
+      {
+        title: "Pirate Cards",
+        img: "https://imgur.com/AtV66Hh.jpg",
+        url: "https://famobi.cdn.msnfun.com/9ngwz0hzshbt/v6/index.html"
+      },
+      {
+        title: "Endless Truck",
+        img: "https://imgur.com/k4rLQig.jpg",
+        url: "https://famobi.cdn.msnfun.com/9n7k1lstsdd7/v6/index.html"
+      },
+      {
+        title: "Parking Jam",
+        img: "https://imgur.com/KQHroPX.jpg",
+        url: "https://famobi.cdn.msnfun.com/9pk4qwzmhgbv/v14/index.html"
+      },
+      {
+        title: "hill-racing-2",
+        img: "https://imgur.com/g7TAA1E.jpg",
+        url: "https://softgames.cdn.msnfun.com/9mw8rk6nb6kr/v33/index.html"
+      },
+      {
+        title: "Bubble Shooter HD",
+        img: "https://imgur.com/lBeQy4C.jpg",
+        url: "https://softgames.cdn.msnfun.com/9nzvl6gzqhkj/v17/index.html"
+      },
+      {
+        title: "Penalty Shooter",
+        img: "https://imgur.com/mU2AzHl.jpg",
+        url: "https://hammerplay.cdn.msnfun.com/9ng6vdg4354c/v20/index.html"
+      },
+      {
+        title: "3D Football Mania",
+        img: "https://imgur.com/CSDLx9y.jpg",
+        url: "https://hammerplay.cdn.msnfun.com/9n38n9hbvp5m/v22/index.html"
+      },
+      {
+        title: "Retro Fruit Machine",
+        img: "https://imgur.com/5asv4ss.jpg",
+        url: "https://cdn.static.pikoya.com/microsoft_store/retro_fruit_machine_web/index.html"
+      },
+      {
+        title: "Master Chess",
+        img: "https://imgur.com/sB3aSVB.jpg",
+        url: "https://codethislab.cdn.msnfun.com/9nrl2nj7l6s1/v69/index.html"
+      },
+      {
+        title: "Master Checkers Multiplayer",
+        img: "https://imgur.com/cAuWdHm.jpg",
+        url: "https://codethislab.cdn.msnfun.com/9p3c5sx31v9k/v11/index.html"
+      },
+      {
+        title: "Brick Out",
+        img: "https://imgur.com/WPknUW0.jpg",
+        url: "https://codethislab.cdn.msnfun.com/9p0frkbsdvrq/v3/index.html"
+      },
+      {
+        title: "Drifting Master",
+        img: "https://imgur.com/T0qgyyM.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9n8v6n73qzfk/v4/index.html"
+      },
+      {
+        title: "Jewel Miner Quest",
+        img: "https://imgur.com/UscZ4yc.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9ndjnsf1cfxd/v8/index.html"
+      },
+      {
+        title: "Defensores de la torre",
+        img: "https://imgur.com/oydbfZX.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9n8tv164mxzf/v45/index.html"
+      },
+      {
+        title: "Wild Hunting Clash",
+        img: "https://imgur.com/dB7i0W6.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9n292xr2128r/v21/index.html"
+      },
+      {
+        title: "1st Prison Escape",
+        img: "https://imgur.com/9MkB5c8.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9p4147dk22wx/v17/index.html"
+      },
+      {
+        title: "Merge World",
+        img: "https://imgur.com/W1bYwFw.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9pbc6d2lh93h/v31/index.html"
+      },
+      {
+        title: "Rompecabezas",
+        img: "https://imgur.com/hH6QXYc.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9nk7ht6xf3hm/v11/index.html"
+      },
+      {
+        title: "Unblock Master",
+        img: "https://imgur.com/iHflEjm.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9p9vtf84lwcv/v4/index.html"
+      },
+      {
+        title: "Furious Sharks",
+        img: "https://imgur.com/Gd2qqU3.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9nvfwwk7d8vd/v10/index.html"
+      },
+      {
+        title: "Drag Racing City",
+        img: "https://imgur.com/SePS6Os.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9nkxlf5z9lkd/v10/index.html"
+      },
+      {
+        title: "Ball Puzzle Mania",
+        img: "https://imgur.com/3TT5NlV.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9pb96t7jntff/v5/index.html"
+      },
+      {
+        title: "Solitaire 15in1 Collection",
+        img: "https://imgur.com/xAoWb1u.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9n1df1l685td/v1/index.html"
+      },
+      {
+        title: "2048: X2 Merge",
+        img: "https://imgur.com/Aef373u.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9nr9fdnj9k7l/v1/index.html"
+      },
+      {
+        title: "Archery Master",
+        img: "https://imgur.com/UpkQXtX.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9nwr5gkn2zcp/v3/index.html"
+      },
+      {
+        title: "Jewel Blocks Quest",
+        img: "https://imgur.com/F08BGhp.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9p9w7486rvg9/v7/index.html"
+      },
+      {
+        title: "Mahjong Royal",
+        img: "https://imgur.com/DyYFmD6.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9pdn821t9sn1/v17/index.html"
+      },
+      {
+        title: "Rompecabezas",
+        img: "https://imgur.com/hnRWMC7.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9nrdt5w1thv0/v8/index.html"
+      },
+      {
+        title: "Clash of Warriors",
+        img: "https://imgur.com/xnV54mB.jpg",
+        url: "https://inlogic.cdn.msnfun.com/9n98lbrjw3zx/v3/index.html"
+      },
+      {
+        title: "Pirate's cannon: a mega battle",
+        img: "https://imgur.com/FMI7i0P.jpg",
+        url: "https://playzool.com/games/pirateSCannonAMB/"
+      },
+      {
+        title: "Rally Champion",
+        img: "https://imgur.com/homi2pe.jpg",
+        url: "https://marketjs.cdn.msnfun.com/9pmdcq52j3hj/v38/index.html"
+      },
+      {
+        title: "Cool Archer",
+        img: "https://imgur.com/aYMt0MC.jpg",
+        url: "https://marketjs.cdn.msnfun.com/9p9dng1tws7b/v21/index.html"
+      },
+      {
+        title: "Hearts",
+        img: "https://imgur.com/MHFE9vh.jpg",
+        url: "https://marketjs.cdn.msnfun.com/9mzhg3kjmmk4/v9/index.html"
+      },
+      {
+        title: "Get to the Chopper",
+        img: "https://imgur.com/NgZ5Wp2.jpg",
+        url: "https://marketjs.cdn.msnfun.com/9nb57v05m44f/v8/index.html"
+      },
+      {
+        title: "Contract Deer Hunter",
+        img: "https://imgur.com/tLoBvc1.jpg",
+        url: "https://marketjs.cdn.msnfun.com/9n5mtb00vthw/v3/index.html"
+      },
+      {
+        title: "Idle Boxing Tycoon",
+        img: "https://imgur.com/n15hvEC.jpg",
+        url: "https://marketjs.cdn.msnfun.com/9p9nrzrj6ms4/v2/index.html"
+      },
+      {
+        title: "Bus Parking Out",
+        img: "https://imgur.com/9K4YWYH.jpg",
+        url: "https://1pef4tscr4350.h5games.usercontent.goog/v/5cogm5r4bf8d0/"
       }
     ];
 
-    const grid = document.getElementById('games-grid');
-    const overlay = document.getElementById('game-overlay');
-    const frame = document.getElementById('game-frame');
+    const container = document.getElementById("games");
+    const modal = document.getElementById("gameModal");
+    const gameFrame = document.getElementById("gameFrame");
+    const closeModal = document.getElementById("closeModal");
 
-    // Renderizar las tarjetas de juegos en pantalla
-    function init() {
-      gamesList.forEach(game => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.onclick = () => openGame(game.url);
+    let lastFocusedElement = null; // Guarda qué elemento tenía el foco antes de abrir un juego
 
-        card.innerHTML = `
-          <div class="card-img-container">
-            <img src="${game.img}" alt="${game.title}" loading="lazy">
-          </div>
-          <div class="card-info">
-            <p class="card-title">${game.title}</p>
-          </div>
-        `;
-        grid.appendChild(card);
+    // Crear tarjetas con la propiedad tabindex para que sean enfocables
+    games.forEach((game, index) => {
+      const card = document.createElement("div");
+      card.className = "game-card";
+      card.setAttribute("tabindex", "0"); // Permite enfocar con el control remoto
+      card.innerHTML = `
+        <img src="${game.img}" alt="${game.title}" loading="lazy"/>
+        <div class="title">${game.title}</div>
+      `;
+      
+      // Lanzamiento del juego
+      const launchGame = () => {
+        lastFocusedElement = document.activeElement; // Almacena el foco actual
+        gameFrame.src = game.url;
+        modal.style.display = "flex";
+        closeModal.focus(); // Mueve el foco al botón cerrar para que sea fácil salir
+      };
+
+      card.addEventListener("click", launchGame);
+      
+      // Permitir abrir con la tecla ENTER del control remoto
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          launchGame();
+        }
+      });
+
+      container.appendChild(card);
+    });
+
+    // Función para cerrar de forma segura el juego y regresar el foco al panel
+    function closeActiveGame() {
+      modal.style.display = "none";
+      gameFrame.src = "";
+      if (lastFocusedElement) {
+        lastFocusedElement.focus(); // Devuelve el foco al juego que estaba seleccionado
+      }
+    }
+
+    closeModal.addEventListener("click", closeActiveGame);
+    closeModal.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        closeActiveGame();
+      }
+    });
+
+    // Cerrar al hacer clic fuera del modal (para dispositivos con mouse)
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeActiveGame();
+      }
+    });
+
+    // --- SISTEMA DE NAVEGACIÓN D-PAD (CONTROL REMOTO DE TV) ---
+    // Detecta las columnas dinámicamente según el tamaño de la pantalla
+    function getColumnsCount() {
+      const cards = document.querySelectorAll(".game-card");
+      if (cards.length === 0) return 1;
+      const firstRowTop = cards[0].offsetTop;
+      let cols = 0;
+      for (let i = 0; i < cards.length; i++) {
+        if (cards[i].offsetTop === firstRowTop) {
+          cols++;
+        } else {
+          break;
+        }
+      }
+      return cols || 1;
+    }
+
+    // Escuchar eventos del teclado / control remoto de la TV
+    window.addEventListener("keydown", (e) => {
+      const active = document.activeElement;
+      
+      // Si el modal del juego está abierto
+      if (modal.style.display === "flex") {
+        // Al presionar BACKSPACE o ESCAPE en el control remoto, cierra el juego de inmediato
+        if (e.key === "Backspace" || e.key === "Escape" || e.keyCode === 8 || e.keyCode === 27 || e.keyCode === 10009) {
+          e.preventDefault();
+          closeActiveGame();
+        }
+        return; // Detiene la navegación del catálogo mientras se juega
+      }
+
+      const cards = Array.from(document.querySelectorAll(".game-card"));
+      const currentIndex = cards.indexOf(active);
+
+      if (currentIndex === -1) {
+        // Si no hay ningún elemento enfocado, enfoca la primera tarjeta al presionar cualquier flecha
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+          if (cards.length > 0) cards[0].focus();
+        }
+        return;
+      }
+
+      const cols = getColumnsCount();
+      let nextIndex = currentIndex;
+
+      switch (e.key) {
+        case "ArrowLeft":
+          if (currentIndex % cols !== 0) {
+            nextIndex = currentIndex - 1;
+          }
+          break;
+        case "ArrowRight":
+          if ((currentIndex + 1) % cols !== 0 && currentIndex + 1 < cards.length) {
+            nextIndex = currentIndex + 1;
+          }
+          break;
+        case "ArrowUp":
+          if (currentIndex - cols >= 0) {
+            nextIndex = currentIndex - cols;
+          }
+          break;
+        case "ArrowDown":
+          if (currentIndex + cols < cards.length) {
+            nextIndex = currentIndex + cols;
+          }
+          break;
+        default:
+          return; // No interviene en otras teclas
+      }
+
+      if (nextIndex !== currentIndex) {
+        e.preventDefault();
+        cards[nextIndex].focus();
+        // Asegura que la TV haga scroll automático para mantener visible el elemento enfocado
+        cards[nextIndex].scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    });
+
+    // Autofoco inicial en la primera tarjeta al cargar la web en la TV
+    window.addEventListener("load", () => {
+      const firstCard = document.querySelector(".game-card");
+      if (firstCard) {
+        firstCard.focus();
+      }
+    });
+  </script>
+  
+  <script>
+    // Registro de interacción humana de manera segura
+    let isHuman = false;
+
+    function markAsHuman() {
+      if (!isHuman) {
+        isHuman = true;
+        console.log("✅ Usuario real detectado");
+        sendHumanVisit();
+      }
+    }
+
+    window.addEventListener("mousemove", markAsHuman);
+    window.addEventListener("keydown", markAsHuman);
+    window.addEventListener("scroll", markAsHuman);
+    window.addEventListener("click", markAsHuman);
+
+    function sendHumanVisit() {
+      fetch("/human-visit", {   
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ human: true, time: Date.now() })
+      }).catch(err => {
+        // Control silencioso del error por si no existe la ruta en su servidor
+        console.log("Registro de visita guardado localmente.");
       });
     }
-
-    // Abrir el juego seleccionado en el Iframe
-    function openGame(url) {
-      frame.src = url;
-      overlay.style.display = 'block';
-      document.body.style.overflow = 'hidden'; // Evita scroll de fondo
-    }
-
-    // Cerrar el juego y limpiar el Iframe
-    function closeGame() {
-      overlay.style.display = 'none';
-      frame.src = ''; // Limpia el juego para que deje de sonar/consumir datos
-      document.body.style.overflow = 'auto';
-    }
-
-    // Iniciar
-    init();
   </script>
-</body>
+ </body>
 </html>
