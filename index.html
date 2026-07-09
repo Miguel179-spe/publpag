@@ -103,7 +103,7 @@ html,body{background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;h
 
     <div id="pload"><div class="spin"></div><div style="font-size:12px;color:#888">Conectando...</div></div>
     <div id="perr">
-      <div> Error al reproducir</div>
+      <div>❌ Error al reproducir</div>
       <div id="perr-msg"></div>
       <div id="perr-actions">
         <button class="pbtn" onclick="retry()">Reintentar</button>
@@ -116,19 +116,7 @@ html,body{background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;h
         <div id="ptitle"></div>
         <div id="pgroup"></div>
       </div>
-      
-      <div id="pbottom">
-        <div id="pprog">
-          <span class="ptime" id="ptime-cur">0:00</span>
-          <div id="pbar"><div id="pbuf"></div><div id="pfill"></div></div>
-          <span class="ptime" id="ptime-dur" style="text-align:right">0:00</span>
-        </div>
-        <div id="pctrl">
-          <button class="pbtn" onclick="seek(-10)">-10</button>
-          <button class="pbtn" id="pbtnplay" onclick="togglePlay()">⏸</button>
-          <button class="pbtn" onclick="seek(10)">+10</button>
-        </div>
-      </div>
+     
     </div>
   </div>
 </div>
@@ -137,153 +125,423 @@ html,body{background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;h
 // ── Channel data ────────────────────────────────────────────────────────────
 const CHANNELS = [
   // YouTube
-  {id:"natgeo",title:"National Geographic",poster:"https://i.imgur.com/pVCAztn.jpeg",url:"https://www.youtube.com/watch?v=p2AzyIEuFak",type:"youtube",group:"Destacados"},
-  {id:"n_foro",title:"N+ Foro",poster:"https://i.imgur.com/pmt4om3.jpeg",url:"https://www.youtube.com/watch?v=p2AzyIEuFak",type:"youtube",group:"Noticias"},
-  {id:"mansion_vip",title:"La Mansión VIP",poster:"https://i.imgur.com/YcQZe3q.jpeg",url:"https://www.youtube.com/watch?v=SY07oPHXblg",type:"youtube",group:"Entretenimiento"},
-  {id:"dw_espanol",title:"DW Español",poster:"https://i.imgur.com/rLZEwU8.jpeg",url:"https://www.youtube.com/watch?v=yZh3xsFqCt8",type:"youtube",group:"Noticias"},
-  {id:"telemundo",title:"Telemundo",poster:"https://i.imgur.com/WIxKWqd.jpeg",url:"https://www.youtube.com/watch?v=c660thEPeeY",type:"youtube",group:"Entretenimiento"},
-  {id:"fifa",title:"FIFA+",poster:"https://i.imgur.com/D8QLdJx.jpeg",url:"https://www.youtube.com/watch?v=kMNm9L0TM1w",type:"youtube",group:"Deportes"},
-  {id:"tv5monde",title:"TV5MONDE",poster:"https://i.imgur.com/MfR2BhX.jpeg",url:"https://www.youtube.com/watch?v=b4tE5aKhtlg",type:"youtube",group:"Destacados"},
-  {id:"cnbc",title:"CNBC",poster:"https://i.imgur.com/or4kB1R.jpeg",url:"https://www.youtube.com/watch?v=ys7QuChSaLA",type:"youtube",group:"Noticias"},
-  {id:"tele_barn",title:"Tele Bárn",poster:"https://i.imgur.com/yis4MU0.jpeg",url:"https://www.youtube.com/watch?v=XQLEvieRMj4",type:"youtube",group:"Entretenimiento"},
-  {id:"cbs",title:"CBS News",poster:"https://i.imgur.com/3vCslJ3.jpeg",url:"https://www.youtube.com/watch?v=OAqh7KV-r3I",type:"youtube",group:"Noticias"},
-  {id:"c5n",title:"C5N",poster:"https://i.imgur.com/2sk5y5e.jpeg",url:"https://www.youtube.com/watch?v=izMS1aAj6yY",type:"youtube",group:"Noticias"},
-  {id:"ytlive05",title:"Live Music & Relax",poster:"https://imgur.com/pcP3z5h.jpg",url:"https://www.youtube.com/watch?v=vGPBYPx8eNc",type:"youtube",group:"Música"},
-  {id:"ytlive06",title:"Live Stream HD 1",poster:"https://i.ytimg.com/vi/Im6zFFXNW7k/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=Im6zFFXNW7k",type:"youtube",group:"Destacados"},
-  {id:"ytlive07",title:"Canal En Vivo HD",poster:"https://i.ytimg.com/vi/WUDI-K0QH_U/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=tZwgyEXtKoI",type:"youtube",group:"Destacados"},
-  {id:"ytlive1",title:"YouTube Live 1",poster:"https://i.ytimg.com/vi/_-Qg5jD-PfA/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=_-Qg5jD-PfA",type:"youtube",group:"Destacados"},
-  {id:"ytlive2",title:"YouTube Live 2",poster:"https://i.ytimg.com/vi/ADXWeM9wsDw/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=ADXWeM9wsDw",type:"youtube",group:"Destacados"},
-  {id:"ytlive3",title:"YouTube Live 3",poster:"https://i.ytimg.com/vi/4WSVB8B9VCw/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=4WSVB8B9VCw",type:"youtube",group:"Destacados"},
-  {id:"ytlive4",title:"YouTube Live 4",poster:"https://i.ytimg.com/vi/UDvdKUj74cQ/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=UDvdKUj74cQ",type:"youtube",group:"Destacados"},
-  {id:"ytlive5",title:"YouTube Live 5",poster:"https://i.ytimg.com/vi/EZbWqlw0sK4/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=f7PA6Gjc7ME",type:"youtube",group:"Destacados"},
-  {id:"ytlive6",title:"YouTube Live 6",poster:"https://i.ytimg.com/vi/cb12KmMMDJA/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=cb12KmMMDJA",type:"youtube",group:"Destacados"},
-  {id:"ytlive7",title:"YouTube Live 7",poster:"https://i.ytimg.com/vi/U9gigT3Z8GU/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=U9gigT3Z8GU",type:"youtube",group:"Destacados"},
-  {id:"ytlive8",title:"YouTube Live 8",poster:"https://i.ytimg.com/vi/VTL9FJylNJY/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=VTL9FJylNJY",type:"youtube",group:"Destacados"},
-  {id:"ytlive9",title:"YouTube Live 9",poster:"https://i.ytimg.com/vi/5zcVfWXbus0/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=5zcVfWXbus0",type:"youtube",group:"Destacados"},
-  {id:"ytlive10",title:"YouTube Live 10",poster:"https://i.ytimg.com/vi/ITBtNXd5WJs/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=ITBtNXd5WJs",type:"youtube",group:"Destacados"},
-  {id:"ytlive11",title:"YouTube Live 11",poster:"https://i.ytimg.com/vi/ArKbAx1K-2U/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=ArKbAx1K-2U",type:"youtube",group:"Destacados"},
-  {id:"ytlive12",title:"YouTube Live 12",poster:"https://i.ytimg.com/vi/32mBptivjPw/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=32mBptivjPw",type:"youtube",group:"Destacados"},
-  {id:"ytlive13",title:"YouTube Live 13",poster:"https://i.ytimg.com/vi/2rR3K23z3b0/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=2rR3K23z3b0",type:"youtube",group:"Destacados"},
-  {id:"ytlive14",title:"YouTube Live 14",poster:"https://i.ytimg.com/vi/HfgIFGbdGJ0/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=HfgIFGbdGJ0",type:"youtube",group:"Destacados"},
-  {id:"ytlive15",title:"YouTube Live 15",poster:"https://i.ytimg.com/vi/hhcm7NMcPjc/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=hhcm7NMcPjc",type:"youtube",group:"Destacados"},
-  {id:"ytlive16",title:"YouTube Live 16",poster:"https://i.ytimg.com/vi/iW3dacPNKP8/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=iW3dacPNKP8",type:"youtube",group:"Destacados"},
-  {id:"ytlive17",title:"YouTube Live 17",poster:"https://i.ytimg.com/vi/htd8gKYYEFM/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=htd8gKYYEFM",type:"youtube",group:"Destacados"},
-  {id:"ytlive18",title:"YouTube Live 18",poster:"https://i.ytimg.com/vi/RHUauMcYlX0/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=RHUauMcYlX0",type:"youtube",group:"Destacados"},
-  {id:"ytlive19",title:"YouTube Live 19",poster:"https://i.ytimg.com/vi/kmDfG8aaifA/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=kmDfG8aaifA",type:"youtube",group:"Destacados"},
-  {id:"ytlive20",title:"YouTube Live 20",poster:"https://i.ytimg.com/vi/P-Q13_WJBdE/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=P-Q13_WJBdE",type:"youtube",group:"Destacados"},
-  {id:"ytlive21",title:"YouTube Live 21",poster:"https://i.ytimg.com/vi/lyTaabST0Hg/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=lyTaabST0Hg",type:"youtube",group:"Destacados"},
-  {id:"ytlive22",title:"YouTube Live 22",poster:"https://i.ytimg.com/vi/vCuQb6Kv7DM/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=vCuQb6Kv7DM",type:"youtube",group:"Destacados"},
-  {id:"ytlive23",title:"YouTube Live 23",poster:"https://i.ytimg.com/vi/4MoETv_RYqs/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=4MoETv_RYqs",type:"youtube",group:"Destacados"},
-  {id:"ytlive24",title:"YouTube Live 24",poster:"https://i.ytimg.com/vi/91RbCzAna4U/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=91RbCzAna4U",type:"youtube",group:"Destacados"},
-  {id:"ytlive25",title:"YouTube Live 25",poster:"https://i.ytimg.com/vi/V6RlyFXQu6I/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=V6RlyFXQu6I",type:"youtube",group:"Destacados"},
-  {id:"ytlive26",title:"YouTube Live 26",poster:"https://i.ytimg.com/vi/ItoNVjSmkx0/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=ItoNVjSmkx0",type:"youtube",group:"Destacados"},
-  {id:"ytlive27",title:"YouTube Live 27",poster:"https://i.ytimg.com/vi/yT5Jx87JIGk/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=yT5Jx87JIGk",type:"youtube",group:"Destacados"},
-  {id:"ytlive28",title:"YouTube Live 28",poster:"https://i.ytimg.com/vi/nndzeKDSjuc/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=nndzeKDSjuc",type:"youtube",group:"Destacados"},
-  {id:"ytlive29",title:"YouTube Live 29",poster:"https://i.ytimg.com/vi/XhAYcYpPzTc/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=XhAYcYpPzTc",type:"youtube",group:"Destacados"},
-  {id:"ytlive30",title:"YouTube Live 30",poster:"https://i.ytimg.com/vi/JC7f3EUDaqw/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=JC7f3EUDaqw",type:"youtube",group:"Destacados"},
-  {id:"ytlive31",title:"YouTube Live 31",poster:"https://i.ytimg.com/vi/wrWTcYqHFbw/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=wrWTcYqHFbw",type:"youtube",group:"Destacados"},
-  {id:"ytlive32",title:"YouTube Live 32",poster:"https://i.ytimg.com/vi/iOEivs314ME/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=iOEivs314ME",type:"youtube",group:"Destacados"},
-  {id:"ytlive33",title:"YouTube Live 33",poster:"https://i.ytimg.com/vi/06dm2HAebC0/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=06dm2HAebC0",type:"youtube",group:"Destacados"},
-  {id:"ytlive34",title:"YouTube Live 34",poster:"https://i.ytimg.com/vi/G43NInZfoPE/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=G43NInZfoPE",type:"youtube",group:"Destacados"},
-  {id:"ytlive35",title:"YouTube Live 35",poster:"https://i.ytimg.com/vi/iiRNq1sxr0U/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=iiRNq1sxr0U",type:"youtube",group:"Destacados"},
-  {id:"ytlive36",title:"YouTube Live 36",poster:"https://i.ytimg.com/vi/8abNZunCgUM/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=8abNZunCgUM",type:"youtube",group:"Destacados"},
-  {id:"ytlive37",title:"YouTube Live 37",poster:"https://i.ytimg.com/vi/QKBJx_gpr9w/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=QKBJx_gpr9w",type:"youtube",group:"Destacados"},
-  {id:"ytlive38",title:"YouTube Live 38",poster:"https://i.ytimg.com/vi/UiODxV3h97Y/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=UiODxV3h97Y",type:"youtube",group:"Destacados"},
-  {id:"ytlive39",title:"YouTube Live 39",poster:"https://i.ytimg.com/vi/uwQ7abWT_1Q/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=uwQ7abWT_1Q",type:"youtube",group:"Destacados"},
-  {id:"ytlive40",title:"YouTube Live 40",poster:"https://i.ytimg.com/vi/dq4nIKmTfiw/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=dq4nIKmTfiw",type:"youtube",group:"Destacados"},
-  {id:"ytlive41",title:"YouTube Live 41",poster:"https://i.ytimg.com/vi/yzKTO-6KWHU/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=yzKTO-6KWHU",type:"youtube",group:"Destacados"},
-  {id:"ytlive42",title:"YouTube Live 42",poster:"https://i.ytimg.com/vi/C6hI2WB3wH8/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=C6hI2WB3wH8",type:"youtube",group:"Destacados"},
-  {id:"ytlive43",title:"YouTube Live 43",poster:"https://i.ytimg.com/vi/rJU6YjyUbbE/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=rJU6YjyUbbE",type:"youtube",group:"Destacados"},
-  {id:"ytlive44",title:"YouTube Live 44",poster:"https://i.ytimg.com/vi/_lpCkEHwmkE/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=_lpCkEHwmkE",type:"youtube",group:"Destacados"},
-  {id:"ytlive45",title:"YouTube Live 45",poster:"https://i.ytimg.com/vi/rGaRCYxyRk8/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=rGaRCYxyRk8",type:"youtube",group:"Destacados"},
-  {id:"ytlive46",title:"YouTube Live 46",poster:"https://i.ytimg.com/vi/GaEBcLZHqTI/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=GaEBcLZHqTI",type:"youtube",group:"Destacados"},
-  {id:"ytlive47",title:"YouTube Live 47",poster:"https://i.ytimg.com/vi/ypfVHZgE-gc/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=ypfVHZgE-gc",type:"youtube",group:"Destacados"},
-  {id:"ytlive48",title:"YouTube Live 48",poster:"https://i.ytimg.com/vi/t0GrpAgdBFI/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=t0GrpAgdBFI",type:"youtube",group:"Destacados"},
-  {id:"ytlive49",title:"YouTube Live 49",poster:"https://i.ytimg.com/vi/Dym5Nm5e17c/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=Dym5Nm5e17c",type:"youtube",group:"Destacados"},
-  {id:"ytlive50",title:"YouTube Live 50",poster:"https://i.ytimg.com/vi/q2Dxx5704fQ/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=q2Dxx5704fQ",type:"youtube",group:"Destacados"},
-  {id:"ytlive01",title:"Video 1",poster:"https://i.ytimg.com/vi/0FBiyFpV__g/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=0FBiyFpV__g",type:"youtube",group:"Destacados"},
-  {id:"ytlive02",title:"Video 2",poster:"https://i.ytimg.com/vi/jUCIORHC_gM/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=jUCIORHC_gM",type:"youtube",group:"Destacados"},
-  {id:"ytlive03",title:"Video 3",poster:"https://i.ytimg.com/vi/R8MRTG0pYdc/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=R8MRTG0pYdc",type:"youtube",group:"Destacados"},
-  {id:"ytlive04",title:"Video 4",poster:"https://i.ytimg.com/vi/XYdZPXiQMXs/maxresdefault.jpg",url:"https://www.youtube.com/watch?v=XYdZPXiQMXs",type:"youtube",group:"Destacados"},
-  // M3U / HLS
-  {id:"m3u_13c",title:"13 C",poster:"",url:"http://181.78.79.131:8000/play/a0pm",type:"hls",group:"General"},
-  {id:"m3u_tuves",title:"Canal TUVES",poster:"",url:"http://181.78.79.131:8000/play/a0q8",type:"hls",group:"General"},
-  {id:"m3u_congreso",title:"Canal del Congreso",poster:"",url:"http://181.78.79.131:8000/play/a0se",type:"hls",group:"General"},
-  {id:"m3u_hola",title:"HOLA TV HD",poster:"",url:"http://181.78.79.131:8000/play/a0pw",type:"hls",group:"General"},
-  {id:"m3u_id",title:"ID",poster:"",url:"http://181.78.79.131:8000/play/a0sl",type:"hls",group:"General"},
-  {id:"m3u_estrellas",title:"Las Estrellas HD",poster:"",url:"http://181.78.79.131:8000/play/a0qu",type:"hls",group:"General"},
-  {id:"m3u_aehd",title:"A&E HD",poster:"",url:"http://181.78.79.131:8000/play/a0mt",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_adultsw",title:"Adult Swim",poster:"",url:"http://181.78.79.131:8000/play/a0pk",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_babyfirst",title:"Baby First",poster:"",url:"http://181.78.79.131:8000/play/a0sw",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_comedycentral",title:"Comedy Central HD",poster:"",url:"http://181.78.79.131:8000/play/a0mu",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_disneyjr",title:"Disney Jr.",poster:"",url:"http://181.78.79.131:8000/play/a0p7",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_lifetime",title:"Lifetime",poster:"",url:"http://181.78.79.131:8000/play/a0pi",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_mtvhd",title:"MTV HD",poster:"",url:"http://181.78.79.131:8000/play/a0nc",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_nickhd",title:"Nickelodeon HD",poster:"",url:"http://181.78.79.131:8000/play/a0qm",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_tooncast",title:"Tooncast",poster:"",url:"http://181.78.79.131:8000/play/a0pe",type:"hls",group:"Entretenimiento"},
-  {id:"m3u_amchd",title:"AMC HD",poster:"",url:"http://181.78.79.131:8000/play/a0n2",type:"hls",group:"Películas"},
-  {id:"m3u_axnhd",title:"AXN HD",poster:"",url:"http://181.78.79.131:8000/play/a0q0",type:"hls",group:"Películas"},
-  {id:"m3u_cinecanal",title:"Cinecanal",poster:"",url:"http://181.78.79.131:8000/play/a0pp",type:"hls",group:"Películas"},
-  {id:"m3u_depel",title:"De Película",poster:"",url:"http://181.78.79.131:8000/play/a0qb",type:"hls",group:"Películas"},
-  {id:"m3u_hbo",title:"HBO",poster:"",url:"http://181.78.79.131:8000/play/a0qd",type:"hls",group:"Películas"},
-  {id:"m3u_hboxt",title:"HBO Xtreme HD",poster:"",url:"http://181.78.79.131:8000/play/a0qy",type:"hls",group:"Películas"},
-  {id:"m3u_pasiones",title:"Pasiones HD",poster:"",url:"http://181.78.79.131:8000/play/a0qh",type:"hls",group:"Películas"},
-  {id:"m3u_spacehd",title:"Space HD",poster:"",url:"http://181.78.79.131:8000/play/a0q2",type:"hls",group:"Películas"},
-  {id:"m3u_tntnov",title:"TNT Novelas HD",poster:"",url:"http://181.78.79.131:8000/play/a0na",type:"hls",group:"Películas"},
-  {id:"m3u_tlnov",title:"Tlnovelas",poster:"",url:"http://181.78.79.131:8000/play/a0t6",type:"hls",group:"Películas"},
-  {id:"m3u_universal",title:"Universal Channel HD",poster:"",url:"http://181.78.79.131:8000/play/a0mw",type:"hls",group:"Películas"},
-  {id:"m3u_warner",title:"Warner",poster:"",url:"http://181.78.79.131:8000/play/a0sz",type:"hls",group:"Películas"},
-  {id:"m3u_warnertv",title:"Warner TV HD",poster:"",url:"http://181.78.79.131:8000/play/a0pz",type:"hls",group:"Películas"},
-  {id:"m3u_animalplanet",title:"Animal Planet",poster:"",url:"http://181.78.79.131:8000/play/a0po",type:"hls",group:"Documentales"},
-  {id:"m3u_discoverysci",title:"Discovery Science",poster:"",url:"http://181.78.79.131:8000/play/a0pb",type:"hls",group:"Documentales"},
-  {id:"m3u_discoverytb",title:"Discovery Turbo",poster:"",url:"http://181.78.79.131:8000/play/a0p8",type:"hls",group:"Documentales"},
-  {id:"m3u_discoverywld",title:"Discovery World HD",poster:"",url:"http://181.78.79.131:8000/play/a0n8",type:"hls",group:"Documentales"},
-  {id:"m3u_hgtv",title:"HGTV",poster:"",url:"http://181.78.79.131:8000/play/a0pf",type:"hls",group:"Documentales"},
-  {id:"m3u_history",title:"History Channel",poster:"",url:"http://181.78.79.131:8000/play/a0st",type:"hls",group:"Documentales"},
-  {id:"m3u_natgeo",title:"Nat Geo HD",poster:"",url:"http://181.78.79.131:8000/play/a0pt",type:"hls",group:"Documentales"},
-  {id:"m3u_tlc",title:"TLC",poster:"",url:"http://181.78.79.131:8000/play/a0t3",type:"hls",group:"Documentales"},
-  {id:"m3u_espn",title:"ESPN",poster:"",url:"http://181.78.79.131:8000/play/a0s7",type:"hls",group:"Deportes"},
-  {id:"m3u_espn2",title:"ESPN 2 HD",poster:"",url:"http://181.78.79.131:8000/play/a0qj",type:"hls",group:"Deportes"},
-  {id:"m3u_espn3",title:"ESPN 3 HD",poster:"",url:"http://181.78.79.131:8000/play/a0s6",type:"hls",group:"Deportes"},
-  {id:"m3u_espn4",title:"ESPN 4 HD",poster:"",url:"http://181.78.79.131:8000/play/a0s9",type:"hls",group:"Deportes"},
-  {id:"m3u_espn5",title:"ESPN 5 HD",poster:"",url:"http://181.78.79.131:8000/play/a0s5",type:"hls",group:"Deportes"},
-  {id:"m3u_espn6",title:"ESPN 6 HD",poster:"",url:"http://181.78.79.131:8000/play/a0s3",type:"hls",group:"Deportes"},
-  {id:"m3u_espn7",title:"ESPN 7 HD",poster:"",url:"http://181.78.79.131:8000/play/a0s8",type:"hls",group:"Deportes"},
-  {id:"m3u_espnprem",title:"ESPN Premium",poster:"",url:"http://181.78.79.131:8000/play/a0r2",type:"hls",group:"Deportes"},
-  {id:"m3u_sunchannel",title:"Sun Channel HD",poster:"",url:"http://181.78.79.131:8000/play/a0qz",type:"hls",group:"Deportes"},
-  {id:"m3u_tntsports",title:"TNT Sports Premium",poster:"",url:"http://181.78.79.131:8000/play/a0q9",type:"hls",group:"Deportes"},
-  {id:"m3u_winsports",title:"Win Sports+ HD",poster:"",url:"http://181.78.79.131:8000/play/a0n1",type:"hls",group:"Deportes"},
-  {id:"m3u_cnn",title:"CNN Español",poster:"",url:"http://181.78.79.131:8000/play/a0p3",type:"hls",group:"Noticias"},
-  {id:"m3u_france24",title:"France 24 English",poster:"https://upload.wikimedia.org/wikipedia/commons/6/67/France_24_logo.svg",url:"https://static.france24.com/live/F24_EN_LO_HLS/live_web.m3u8",type:"hls",group:"Noticias"},
-  {id:"m3u_lakalle",title:"LA KALLE",poster:"",url:"http://181.78.79.131:8000/play/a0l3",type:"hls",group:"Música"},
-  {id:"m3u_betheltv",title:"BETHEL TV",poster:"",url:"http://181.78.79.131:8000/play/a0pn",type:"hls",group:"Religión"},
-  {id:"m3u_enlace",title:"Enlace",poster:"",url:"http://181.78.79.131:8000/play/a0pj",type:"hls",group:"Religión"},
-  {id:"m3u_dhe",title:"DHE HD",poster:"",url:"http://181.78.79.131:8000/play/a0qv",type:"hls",group:"Infantiles"},
-  {id:"m3u_canal1",title:"Canal 1",poster:"",url:"http://181.78.79.131:8000/play/a0s2",type:"hls",group:"Colombia"},
-  {id:"m3u_canalinst",title:"Canal Institucional",poster:"",url:"http://181.78.79.131:8000/play/a0l8",type:"hls",group:"Colombia"},
-  {id:"m3u_caracolhd",title:"Caracol TV HD",poster:"",url:"http://181.78.79.131:8000/play/a0l0",type:"hls",group:"Colombia"},
-  {id:"m3u_canalcaracol",title:"Canal Caracol",poster:"",url:"http://181.78.79.131:8000/play/a0sb",type:"hls",group:"Colombia"},
-  {id:"m3u_rcn",title:"Canal RCN",poster:"",url:"http://181.78.79.131:8000/play/a0sc",type:"hls",group:"Colombia"},
-  {id:"m3u_citytv",title:"City TV",poster:"",url:"http://181.78.79.131:8000/play/a0si",type:"hls",group:"Colombia"},
-  {id:"m3u_rcnhd",title:"RCN HD",poster:"",url:"http://181.78.79.131:8000/play/a0l4",type:"hls",group:"Colombia"},
-  {id:"m3u_rcnnovelas",title:"RCN Novelas",poster:"",url:"http://181.78.79.131:8000/play/a0sk",type:"hls",group:"Colombia"},
-  {id:"m3u_senalcol",title:"Señal Colombia",poster:"",url:"http://181.78.79.131:8000/play/a0l7",type:"hls",group:"Colombia"},
-  {id:"m3u_telecaribe",title:"TELECARIBE",poster:"",url:"http://181.78.79.131:8000/play/a0lb",type:"hls",group:"Colombia"},
-  {id:"m3u_tro",title:"TRO",poster:"",url:"http://181.78.79.131:8000/play/a0sh",type:"hls",group:"Colombia"},
-  {id:"m3u_chv",title:"CHV",poster:"",url:"http://181.78.79.131:8000/play/a0r0",type:"hls",group:"Chile"},
-  {id:"m3u_canal13_c",title:"Canal 13",poster:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Canal_13_logo_2018.svg",url:"https://rudo.video/live/c13",type:"hls",group:"Chile"},
-  {id:"m3u_24horas",title:"Canal 24 Horas",poster:"",url:"http://181.78.79.131:8000/play/a0qr",type:"hls",group:"Chile"},
-  {id:"m3u_capital",title:"Capital",poster:"",url:"http://181.78.79.131:8000/play/a0sj",type:"hls",group:"Chile"},
-  {id:"m3u_lared",title:"La Red",poster:"",url:"http://181.78.79.131:8000/play/a0qq",type:"hls",group:"Chile"},
-  {id:"m3u_megahd",title:"MEGA HD",poster:"https://upload.wikimedia.org/wikipedia/commons/0/03/Logo_Mega_2015.png",url:"https://rudo.video/live/mega",type:"hls",group:"Chile"},
-  {id:"m3u_mega",title:"Mega",poster:"https://upload.wikimedia.org/wikipedia/commons/0/03/Logo_Mega_2015.png",url:"http://181.78.79.131:8000/play/a0r1",type:"hls",group:"Chile"},
-  {id:"m3u_tvmas",title:"TV+",poster:"",url:"http://181.78.79.131:8000/play/a0qo",type:"hls",group:"Chile"},
-  {id:"m3u_tvn",title:"TVN",poster:"https://upload.wikimedia.org/wikipedia/commons/5/56/TVN_logo_2020.svg",url:"https://rudo.video/live/tvn",type:"hls",group:"Chile"},
-  {id:"m3u_viax",title:"ViaX",poster:"",url:"http://181.78.79.131:8000/play/a0t4",type:"hls",group:"Chile"},
-  {id:"m3u_zoom",title:"Zoom",poster:"",url:"http://181.78.79.131:8000/play/a0sg",type:"hls",group:"Chile"},
-  {id:"m3u_atv",title:"ATV",poster:"",url:"http://181.78.79.131:8000/play/a0sp",type:"hls",group:"Latinoamérica"},
-  {id:"m3u_panamericana",title:"Panamericana TV",poster:"",url:"https://unlimited6-cl.dps.live/sportinghd/sportinghd.smil/playlist.m3u8",type:"hls",group:"Latinoamérica"},
-];
+  {
+  id: "barca_tv",
+  title: "Barça TV",
+  poster: "https://imgur.com/NZ55dew.png",
+  url: "https://amg17560-fcb-amg17560c2-rakuten-es-4889.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg17560-fcbarcelona-topbarcaspanish-rakutenes/cb563d167d6c63909bc93678d2f962ffa65928d80b6c852a6ab454876da64607d1e3b680fd358b785d9f01de6a1a0a080361cf12ce3407c3c76ad91174204213cfcac9229d86170ab5c60c2c3aab016635837209c0790a79dca93d0d8636ba304530e01b615b37c2ec5da46852db80148b6f4adafb8c2360625f5c98435ee3b24aaba9e558108a6ca2ac1b4e967b58e68314c8c94ded86d1469e12d022a315c995f483d011e023a059846f3ec0bf39581fbdaf3be1ed52bbd394603a9d7f68741b45f3a19ff74d4efe2d2172d98f063bf89d69a3a72a93743ffb21954a9639896ad066cf599e15ccc9b76c403aadcb55602be296c8322b8052cf04abf393b55d7d9aff1b7646c527bf484e69c0a89a46d6887df3c718546be5e32492b13cb3ad2efbfcabbcead650ebcaf18a34414f2c37038849ada549d424d476afc129ec3d274b80954fcd8ad55f7f3701d6c016e31a15bdd49c909f200f8a314b14b83b996c0c629a60373cfd7badd37c4d993606800238f9733c940da9eb7bbbf48da54e109deaea6eb32fe3bc01d7b625ac6e37564bf3d1244d4a41789fbf32547e298d15aa838ad2760f01fefe82ab930476546f652766e1d5ee7e9f81d73a5d479121414e405046c64a86139c6a2f2721c619dfa97304a60e3322eba27f101a5b9fc6b58e90c58823917ac0c4e9363f313b30e5d3648dc82904ebdf3acc474e9559b5f40305a2edde0b34/38/1920x1080_5129264/index.m3u8",
+  type: "hls"
+},
+{
+  id: "dazn1",
+  title: "DAZN 1",
+  poster: "https://imgur.com/sgXyJc5.png",
+  url: "https://unlimited6-cl.dps.live/sportinghd/sportinghd.smil/playlist.m3u8",
+  type: "hls"
+},
+{
+  id: "sporttv1",
+  title: "SPORT TV 1",
+  poster: "https://imgur.com/ZDtHwKu.png",
+  url: "http://cord-cutter.net:8080/live/5uWnY2/585054/266568.m3u8",
+  type: "hls"
+},
+
+{
+  id: "dw_espanol",
+  title: "DW Español",
+  poster: "https://i.imgur.com/rLZEwU8.jpeg",
+  url: "https://www.youtube.com/watch?v=yZh3xsFqCt8",
+  type: "youtube"
+},
+{
+  id: "eurosport1",
+  title: "Eurosport 1",
+  poster: "https://imgur.com/pZgCh3e.jpeg",
+  url: "http://cm1.portaltv.info:777/live/SuadaKelmendi/uFwyH56E4I/2587.m3u8",
+  type: "hls"
+},
+{
+  id: "teleantillas",
+  title: "Teleantillas",
+  poster: "https://imgur.com/5fzDPax.jpeg",
+  url: "https://ds.tvabierta.net/memfs/fde81577-b1ae-48ab-bac4-4ae5908af483_output_0.m3u8?session=Uxz4mUGgQTZHQdWvQoep9i",
+  type: "hls"
+},
+{
+  id: "Disney Channel España",
+  title: "Disney Channel España",
+  poster: "https://imgur.com/oVJMPph.png",
+  url: "https://www.youtube.com/watch?v=CVklGVAgmuw",
+  type: "youtube"
+},
+{
+  id: "ytlive_tele",
+  title: "Live",
+  poster: "https://i.ytimg.com/vi/p1yEJvxnERI/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=p1yEJvxnERI",
+  type: "youtube"
+},
+
+{
+  id: "tnt_west",
+  title: "TNT (West)",
+  poster: "https://imgur.com/UgmwA54.jpeg",
+  url: "http://lb58.1xtr.icu:25461/live/5uWnY2/585054/46688.m3u8?token=ThFcUhFaQQwRBwtcB1AOVA4CBQdVAQVQUlMCAlwKAgFXAgIBWwAHDlAQHkdBQURQV1g7WFQWCgZVVFsLFRFGQVBBa1oGEFkUAgEBXQcGFBkUQQ1cVRYKAk9AE1pdEQkQBAcNBVAQTxRWSkYAQFtXWWlRAUdZV1UQWQwWX1UfEV1bbFBWD1MNUhEIEFQQGRRcRUVGC15BXF5PQAFaTUFSRlARDhFVAlcHER4QBl1AWEFETEYLEnB/EE9ABktNVl1BXFxaEVgQDgVGChBJEFxFakRQF0VCUVFfBhBBCRsDER4XXlVLPVEMWF1XURFbWlhGFA9GCRIYEl8MDApHVkFsQlxXFglAC1EPBAcQGA==",
+  type: "hls"
+},
+{
+  id: "tnt_east",
+  title: "TNT East",
+  poster: "https://imgur.com/xk4NCVt.jpeg",
+  url: "http://lb57.1xtr.icu:25461/live/5uWnY2/585054/10455.m3u8?token=ThFcUhFaQQwRBVRVUVdVUAIEBgMFVgIBWlZWClgHUAYDCwcGUwVTAwEQHkdBQURQV1g7WFQWCgNTVlYGFRFGQVBBa1oGEFkUAgEBXQcGFBkUQQ1cVRYKAk9AE1pdEQkQBwoEBVIQTxRWSkYAQFtXWWlRAUdZV1UQWQwWX1UfEV1bbFBWD1MNUhEIEFQQGRRcRUVGC15BXF5PQAFaTUFSRlARDhFbBFAUHxBRCkdbQkdPF14TdHsSHkEHG0dcXUBbWl0WCUBfUEMLEB5HW0ZpR1NGEENVVV1XEUBZEQkRHxBYUkxsAV0NWFZRRgxdW0UXDBdcExwWXV0NCxdcS2xDW1ERDhFRC1cPEU8=",
+  type: "hls"
+},
+
+{
+  id: "canal_motor",
+  title: "Canal Motor",
+  poster: "https://imgur.com/qiV2mSA.png",
+  url: "https://digicom.hls.iptvdc.com/canalmotor/tracks-v1a1/mono.m3u8",
+  type: "iframe"
+},
+{
+  id: "mytime_movie_br",
+  title: "MyTime Movie Network",
+  poster: "https://imgur.com/Z6j8bjr.png",
+  url: "https://appletree-mytime-samsungbrazil.amagi.tv/playlist720p.m3u8",
+  type: "hls"
+},
+{
+  id: "real_crime",
+  title: "Real Crime",
+  poster: "https://imgur.com/go0RQaN.png",
+  url: "https://lds-realcrimebeta-rakuten.amagi.tv/playlist.m3u8",
+  type: "hls"
+},
+{
+  id: "xumo_universal_action",
+  title: "Universal Action",
+  poster: "https://imgur.com/cHLLECZ.jpeg",
+  url: "https://xumo-xumoent-vc-107-xmuvk.fast.nbcuni.com/live/master_5.m3u8",
+  type: "hls"
+},
+
+{
+  id: "law_crime",
+  title: "Law & Crime",
+  poster: "https://imgur.com/xN8jUuE.png",
+  url: "https://a-cdn.klowdtv.com/live3/law_720p/chunks.m3u8",
+  type: "hls"
+},
+{
+  id: "travel4k",
+  title: "4K Travel TV",
+  poster: "https://imgur.com/212cnSI.jpeg",
+  url: "https://streams2.sofast.tv/sofast2/v1/01977dd01f661ebd47042b72b0c07c/01977dd12cc51ebd416a3eb5c6c77f/4k_travel_tv_2500k.m3u8",
+  type: "hls"
+},
+{
+  id: "ytlive18",
+  title: "YouTube Live 18",
+  poster: "https://i.ytimg.com/vi/ZPjHO-cAZ3A/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=ZPjHO-cAZ3A",
+  type: "youtube"
+},
+{
+  id: "tv5monde",
+  title: "TV5MONDE",
+  poster: "https://i.imgur.com/MfR2BhX.jpeg",
+  url: "https://www.youtube.com/watch?v=b4tE5aKhtlg",
+  type: "youtube"
+},
+{
+  id: "tele_barn",
+  title: "Tele Bárn",
+  poster: "https://i.imgur.com/yis4MU0.jpeg",
+  url: "https://www.youtube.com/watch?v=XQLEvieRMj4",
+  type: "youtube"
+},
+  
+{
+  id: "c5n",
+  title: "C5N",
+  poster: "https://i.imgur.com/2sk5y5e.jpeg",
+  url: "https://www.youtube.com/watch?v=izMS1aAj6yY",
+  type: "youtube"
+},
+{
+  id: "ytlive1",
+  title: "YouTube Live 1",
+  poster: "https://i.ytimg.com/vi/_-Qg5jD-PfA/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=_-Qg5jD-PfA",
+  type: "youtube"
+},
+{
+  id: "ytlive2",
+  title: "YouTube Live 2",
+  poster: "https://i.ytimg.com/vi/ADXWeM9wsDw/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=ADXWeM9wsDw",
+  type: "youtube"
+},
+{
+  id: "ytlive3",
+  title: "YouTube Live 3",
+  poster: "https://i.ytimg.com/vi/4WSVB8B9VCw/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=4WSVB8B9VCw",
+  type: "youtube"
+},
+{
+  id: "ytlive5",
+  title: "YouTube Live 5",
+  poster: "https://i.ytimg.com/vi/EZbWqlw0sK4/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=f7PA6Gjc7ME",
+  type: "youtube"
+},
+{
+  id: "ytlive6",
+  title: "YouTube Live 6",
+  poster: "https://i.ytimg.com/vi/cb12KmMMDJA/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=cb12KmMMDJA",
+  type: "youtube"
+},
+  
+{
+  id: "ytlive3",
+  title: "YouTube Live 3",
+  poster: "https://i.ytimg.com/vi/4WSVB8B9VCw/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=4WSVB8B9VCw",
+  type: "youtube"
+},
+{
+  id: "ytlive5",
+  title: "YouTube Live 5",
+  poster: "https://i.ytimg.com/vi/EZbWqlw0sK4/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=f7PA6Gjc7ME",
+  type: "youtube"
+},
+{
+  id: "ytlive6",
+  title: "YouTube Live 6",
+  poster: "https://i.ytimg.com/vi/cb12KmMMDJA/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=cb12KmMMDJA",
+  type: "youtube"
+},
+ {
+  id: "ytlive10",
+  title: "YouTube Live 10",
+  poster: "https://i.ytimg.com/vi/ITBtNXd5WJs/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=ITBtNXd5WJs",
+  type: "youtube"
+},
+{
+  id: "ytlive11",
+  title: "YouTube Live 11",
+  poster: "https://i.ytimg.com/vi/ArKbAx1K-2U/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=ArKbAx1K-2U",
+  type: "youtube"
+},
+{
+  id: "ytlive12",
+  title: "YouTube Live 12",
+  poster: "https://i.ytimg.com/vi/32mBptivjPw/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=32mBptivjPw",
+  type: "youtube"
+},
+{
+  id: "ytlive14",
+  title: "YouTube Live 14",
+  poster: "https://i.ytimg.com/vi/HfgIFGbdGJ0/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=HfgIFGbdGJ0",
+  type: "youtube"
+},
+{
+  id: "ytlive15",
+  title: "YouTube Live 15",
+  poster: "https://i.ytimg.com/vi/hhcm7NMcPjc/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=hhcm7NMcPjc",
+  type: "youtube"
+},
+{
+  id: "ytlive16",
+  title: "YouTube Live 16",
+  poster: "https://i.ytimg.com/vi/iW3dacPNKP8/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=iW3dacPNKP8",
+  type: "youtube"
+}, 
+ {
+  id: "ytlive18",
+  title: "YouTube Live 18",
+  poster: "https://i.ytimg.com/vi/RHUauMcYlX0/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=RHUauMcYlX0",
+  type: "youtube"
+},
+{
+  id: "ytlive26",
+  title: "YouTube Live 26",
+  poster: "https://i.ytimg.com/vi/ItoNVjSmkx0/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=ItoNVjSmkx0",
+  type: "youtube"
+},
+{
+  id: "ytlive27",
+  title: "YouTube Live 27",
+  poster: "https://i.ytimg.com/vi/yT5Jx87JIGk/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=yT5Jx87JIGk",
+  type: "youtube"
+},
+{
+  id: "ytlive28",
+  title: "YouTube Live 28",
+  poster: "https://i.ytimg.com/vi/nndzeKDSjuc/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=nndzeKDSjuc",
+  type: "youtube"
+},
+{
+  id: "ytlive30",
+  title: "YouTube Live 30",
+  poster: "https://i.ytimg.com/vi/JC7f3EUDaqw/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=JC7f3EUDaqw",
+  type: "youtube"
+},
+{
+  id: "ytlive32",
+  title: "YouTube Live 32",
+  poster: "https://i.ytimg.com/vi/iOEivs314ME/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=iOEivs314ME",
+  type: "youtube"
+}, 
+ {
+  id: "ytlive33",
+  title: "YouTube Live 33",
+  poster: "https://i.ytimg.com/vi/06dm2HAebC0/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=06dm2HAebC0",
+  type: "youtube"
+},
+{
+  id: "ytlive34",
+  title: "YouTube Live 34",
+  poster: "https://i.ytimg.com/vi/G43NInZfoPE/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=G43NInZfoPE",
+  type: "youtube"
+},
+{
+  id: "ytlive37",
+  title: "YouTube Live 37",
+  poster: "https://i.ytimg.com/vi/QKBJx_gpr9w/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=QKBJx_gpr9w",
+  type: "youtube"
+},
+{
+  id: "ytlive40",
+  title: "YouTube Live 40",
+  poster: "https://i.ytimg.com/vi/dq4nIKmTfiw/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=dq4nIKmTfiw",
+  type: "youtube"
+},
+{
+  id: "ytlive41",
+  title: "YouTube Live 41",
+  poster: "https://i.ytimg.com/vi/yzKTO-6KWHU/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=yzKTO-6KWHU",
+  type: "youtube"
+},
+{
+  id: "ytlive42",
+  title: "YouTube Live 42",
+  poster: "https://i.ytimg.com/vi/C6hI2WB3wH8/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=C6hI2WB3wH8",
+  type: "youtube"
+}, 
+{
+  id: "ytlive44",
+  title: "YouTube Live 44",
+  poster: "https://i.ytimg.com/vi/_lpCkEHwmkE/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=_lpCkEHwmkE",
+  type: "youtube"
+},
+{
+  id: "ytlive45",
+  title: "YouTube Live 45",
+  poster: "https://i.ytimg.com/vi/rGaRCYxyRk8/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=rGaRCYxyRk8",
+  type: "youtube"
+},
+{
+  id: "ytlive46",
+  title: "YouTube Live 46",
+  poster: "https://i.ytimg.com/vi/GaEBcLZHqTI/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=GaEBcLZHqTI",
+  type: "youtube"
+},
+{
+  id: "ytlive47",
+  title: "YouTube Live 47",
+  poster: "https://i.ytimg.com/vi/ypfVHZgE-gc/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=ypfVHZgE-gc",
+  type: "youtube"
+},
+{
+  id: "ytlive48",
+  title: "YouTube Live 48",
+  poster: "https://i.ytimg.com/vi/t0GrpAgdBFI/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=t0GrpAgdBFI",
+  type: "youtube"
+},
+{
+  id: "ytlive49",
+  title: "YouTube Live 49",
+  poster: "https://i.ytimg.com/vi/Dym5Nm5e17c/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=Dym5Nm5e17c",
+  type: "youtube"
+},
+{
+  id: "ytlive50",
+  title: "YouTube Live 50",
+  poster: "https://i.ytimg.com/vi/q2Dxx5704fQ/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=q2Dxx5704fQ",
+  type: "youtube"
+},
+{
+  id: "ytlive01",
+  title: "Video 1",
+  poster: "https://i.ytimg.com/vi/0FBiyFpV__g/maxresdefault.jpg",
+  url: "https://www.youtube.com/watch?v=0FBiyFpV__g",
+  type: "youtube"
+},
+  
+ {
+  id: "ytlive03",
+  title: "Video 3",
+  poster: "https://imgur.com/1woM6K8.jpg",
+  url: "https://jmp2.uk/plu-5ebac49ce4dc8b00078b23bc.m3u8",
+  type: "hls"
+}, 
+ {
+  id: "animalplanet01",
+  title: "Animal Planet HD AMAZONAS",
+  poster: "https://imgur.com/UVfOHTT.png",
+  url: "http://181.78.8.199:8000/play/a06w/index.m3u8",
+  type: "hls"
+}, 
+ {
+  id: "elchavotv01",
+  title: "El Chavo TV (720p)",
+  poster: "https://imgur.com/Qw1STyp.png",
+  url: "https://live20.bozztv.com/giatvplayout7/giatv-211465/playlist.m3u8",
+  type: "hls"
+}, 
+  {
+  id: "espn01",
+  title: "ESPN",
+  poster: "https://imgur.com/GteBmUJ.png",
+  url: "http://200.35.176.154:8000/play/a03a/index.m3u8",
+  type: "hls"
+},
+  
+  
+  
+ ];
 
 // ── State ────────────────────────────────────────────────────────────────────
 const GROUPS = ['Todos', ...Array.from(new Set(CHANNELS.map(c => c.group)))];
@@ -307,14 +565,6 @@ const $perrmsg = document.getElementById('perr-msg');
 const $pui     = document.getElementById('pui');
 const $ptitle  = document.getElementById('ptitle');
 const $pgroup  = document.getElementById('pgroup');
-const $pprog   = document.getElementById('pprog');
-const $pctrl   = document.getElementById('pctrl');
-const $pbuf    = document.getElementById('pbuf');
-const $pfill   = document.getElementById('pfill');
-const $ptimec  = document.getElementById('ptime-cur');
-const $ptimed  = document.getElementById('ptime-dur');
-const $pbtnplay= document.getElementById('pbtnplay');
-const $pbar    = document.getElementById('pbar');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmt(s) {
@@ -434,8 +684,6 @@ function playChannel(ch) {
   setLoading(true); setError('');
   $ptitle.textContent = ch.title;
   $pgroup.textContent = ch.group;
-  $pprog.style.display = isYT() ? 'none' : 'flex';
-  $pctrl.style.display = isYT() ? 'none' : 'flex';
   $vid.style.display = isYT() ? 'none' : 'block';
   $ytslot.style.display = isYT() ? 'flex' : 'none';
   $player.classList.add('open');
@@ -502,27 +750,13 @@ function seek(s) {
 // ── Video events ──────────────────────────────────────────────────────────────
 $vid.addEventListener('canplay',  () => setLoading(false));
 $vid.addEventListener('waiting',  () => setLoading(true));
-$vid.addEventListener('playing',  () => { setLoading(false); $pbtnplay.textContent = '⏸'; });
-$vid.addEventListener('pause',    () => { $pbtnplay.textContent = '▶'; });
-$vid.addEventListener('timeupdate', () => {
-  $ptimec.textContent = fmt($vid.currentTime);
-  if ($vid.duration) $pfill.style.width = ($vid.currentTime / $vid.duration * 100) + '%';
-});
-$vid.addEventListener('durationchange', () => { $ptimed.textContent = fmt($vid.duration); });
-$vid.addEventListener('progress', () => {
-  if ($vid.buffered.length && $vid.duration)
-    $pbuf.style.width = ($vid.buffered.end($vid.buffered.length-1) / $vid.duration * 100) + '%';
-});
+$vid.addEventListener('playing',  () => setLoading(false));
+$vid.addEventListener('pause',    () => {});
 $vid.addEventListener('error', () => {
   const e = $vid.error;
   setLoading(false); setError(e ? `Error de video (código ${e.code})` : 'Error al reproducir');
 });
 
-$pbar.addEventListener('click', e => {
-  if (!$vid.duration) return;
-  const r = $pbar.getBoundingClientRect();
-  $vid.currentTime = ((e.clientX - r.left) / r.width) * $vid.duration;
-});
 
 // ── Browser back button ───────────────────────────────────────────────────────
 window.addEventListener('popstate', () => {
